@@ -1,20 +1,24 @@
-package com.portes.wikihikingosm
+package com.portes.wikihikingosm.feature.hikings
 
 import android.content.Context
 import android.os.Bundle
-import android.preference.PreferenceManager
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
-import com.portes.wikihikingosm.databinding.FragmentHikingRouteBinding
+import androidx.fragment.app.viewModels
+import com.portes.wikihikingosm.feature.hikings.databinding.FragmentHikingRouteBinding
+import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Polyline
 
+@AndroidEntryPoint
 class HikingRouteFragment : Fragment(R.layout.fragment_hiking_route) {
+
+    private val viewModel: HikingRouteViewModel by viewModels()
 
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
     private var _binding: FragmentHikingRouteBinding? = null
@@ -24,7 +28,7 @@ class HikingRouteFragment : Fragment(R.layout.fragment_hiking_route) {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         Configuration.getInstance()
             .load(context, context?.getSharedPreferences("map", Context.MODE_PRIVATE))
         _binding = FragmentHikingRouteBinding.inflate(inflater, container, false)
@@ -41,6 +45,7 @@ class HikingRouteFragment : Fragment(R.layout.fragment_hiking_route) {
         mapController.setCenter(startPoint)
 
         addPolyline()
+        viewModel.addRoute()
     }
 
     override fun onResume() {
