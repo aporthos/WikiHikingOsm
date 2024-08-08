@@ -8,17 +8,20 @@ import com.portes.wikihikingosm.core.models.Route
     tableName = "route",
 )
 data class RouteEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey(autoGenerate = true) val idRoute: Long = 0,
+    val idHikeRoute: Long,
     val latitude: Double,
     val longitude: Double
 )
 
 fun RouteEntity.asModel() = Route(
     latitude = latitude,
-    longitude = longitude
+    longitude = longitude,
+    idHikeRoute = idHikeRoute
 )
 
 fun Route.asEntity() = RouteEntity(
     latitude = latitude,
-    longitude = longitude
+    longitude = longitude,
+    idHikeRoute = idHikeRoute
 )

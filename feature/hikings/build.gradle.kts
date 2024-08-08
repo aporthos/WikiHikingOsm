@@ -50,6 +50,7 @@ dependencies {
     implementation("org.osmdroid:osmdroid-android:6.1.18")
 
     implementation ("androidx.fragment:fragment-ktx:1.8.2")
+    implementation("com.jakewharton.timber:timber:5.0.1")
 
     implementation(project(":core:domain"))
     implementation(project(":core:common"))

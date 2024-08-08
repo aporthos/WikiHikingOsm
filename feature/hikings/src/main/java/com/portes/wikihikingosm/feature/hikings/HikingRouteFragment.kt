@@ -8,12 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.portes.wikihikingosm.feature.hikings.databinding.FragmentHikingRouteBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Polyline
+import timber.log.Timber
 
 @AndroidEntryPoint
 class HikingRouteFragment : Fragment(R.layout.fragment_hiking_route) {
@@ -38,14 +40,34 @@ class HikingRouteFragment : Fragment(R.layout.fragment_hiking_route) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.contentMapView.setTileSource(TileSourceFactory.MAPNIK)
-        val mapController = binding.contentMapView.controller
-        val startPoint = GeoPoint(20.0051082, -98.7737946)
+        binding.contentMapView.setMultiTouchControls(true)
 
-        mapController.setZoom(20.0)
-        mapController.setCenter(startPoint)
+//        viewModel.addRoute()
 
-        addPolyline()
-        viewModel.addRoute()
+        lifecycleScope.launch {
+            viewModel.uiState.collect { state ->
+                when (state) {
+                    is HikingRouteUiState.Success -> {
+                        Timber.i("route name ${state.hike.name}")
+                        Timber.i("route size ${state.route.size}")
+                        Timber.i("route ${state.route}")
+
+                        val mapController = binding.contentMapView.controller
+                        val startPoint = state.route.first()
+
+                        mapController.setZoom(20.0)
+                        mapController.setCenter(startPoint)
+                        val line = Polyline()
+                        line.setPoints(state.route)
+                        binding.contentMapView.overlays.add(line)
+                    }
+
+                    HikingRouteUiState.Loading -> {
+                        Timber.i("cargando ")
+                    }
+                }
+            }
+        }
     }
 
     override fun onResume() {
@@ -56,16 +78,6 @@ class HikingRouteFragment : Fragment(R.layout.fragment_hiking_route) {
     override fun onPause() {
         super.onPause()
         binding.contentMapView.onPause()
-    }
-
-    private fun addPolyline() {
-        val geoPoints = ArrayList<GeoPoint>()
-        geoPoints.add(GeoPoint(20.006505, -98.775829))
-        geoPoints.add(GeoPoint(20.006462, -98.775860))
-        geoPoints.add(GeoPoint(20.006419, -98.775880))
-        val line = Polyline()
-        line.setPoints(geoPoints);
-        binding.contentMapView.overlays.add(line)
     }
 
     override fun onRequestPermissionsResult(

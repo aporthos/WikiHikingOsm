@@ -24,6 +24,7 @@ object DatabaseModule {
         context = context, WikiHikingDatabase::class.java,
         "WikiHikingDatabase.db",
     )
+        .fallbackToDestructiveMigration()
         .build()
 
     @Provides

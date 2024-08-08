@@ -6,19 +6,28 @@ import com.portes.wikihikingosm.core.data.repositories.RouteRepository
 import com.portes.wikihikingosm.core.data.repositories.RouteRepositoryImpl
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.ticofab.androidgpxparser.parser.GPXParser
 
 @Module
 @InstallIn(SingletonComponent::class)
-interface DataModule {
-    @Binds
-    fun bindsRouteRepository(
-        repository: RouteRepositoryImpl,
-    ): RouteRepository
+object DataModule {
+    @Module
+    @InstallIn(SingletonComponent::class)
+    internal interface DataModuleBinder {
+        @Binds
+        fun bindsRouteRepository(
+            repository: RouteRepositoryImpl,
+        ): RouteRepository
 
-    @Binds
-    fun bindsHikeRepository(
-        repository: HikeRepositoryImpl,
-    ): HikeRepository
+        @Binds
+        fun bindsHikeRepository(
+            repository: HikeRepositoryImpl,
+        ): HikeRepository
+    }
+
+    @Provides
+    fun providesParser() = GPXParser()
 }

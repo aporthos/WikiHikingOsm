@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx creator="Wikiloc - https://www.wikiloc.com" version="1.1" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <name>Wikiloc - Casa Mike</name>
+    <author>
+      <name>APortes</name>
+      <link href="https://www.wikiloc.com/wikiloc/user.do?id=14403052">
+        <text>APortes on Wikiloc</text>
+      </link>
+    </author>
+    <link href="https://www.wikiloc.com/hiking-trails/casa-mike-166584393">
+      <text>Casa Mike on Wikiloc</text>
+    </link>
+    <time>2024-04-07T21:14:44.635Z</time>
+  </metadata>
+  <trk>
+    <name>Casa Mike</name>
+    <cmt>La Isla</cmt>
+    <desc>La Isla</desc>
+    <trkseg>
+      <trkpt lat="20.006505" lon="-98.775829">
+        <ele>2360.948</ele>
+        <time>2024-04-07T21:13:01.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006462" lon="-98.775860">
+        <ele>2361.561</ele>
+        <time>2024-04-07T21:13:04.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006419" lon="-98.775880">
+        <ele>2361.017</ele>
+        <time>2024-04-07T21:13:08.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006370" lon="-98.775887">
+        <ele>2361.109</ele>
+        <time>2024-04-07T21:13:13.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006317" lon="-98.775881">
+        <ele>2360.995</ele>
+        <time>2024-04-07T21:13:18.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006282" lon="-98.775850">
+        <ele>2360.780</ele>
+        <time>2024-04-07T21:13:22.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006281" lon="-98.775799">
+        <ele>2359.890</ele>
+        <time>2024-04-07T21:13:26.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006281" lon="-98.775750">
+        <ele>2359.449</ele>
+        <time>2024-04-07T21:13:30.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006280" lon="-98.775698">
+        <ele>2357.812</ele>
+        <time>2024-04-07T21:13:34.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006280" lon="-98.775639">
+        <ele>2355.218</ele>
+        <time>2024-04-07T21:13:39.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006280" lon="-98.775588">
+        <ele>2353.767</ele>
+        <time>2024-04-07T21:13:44.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006283" lon="-98.775534">
+        <ele>2352.953</ele>
+        <time>2024-04-07T21:13:49.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006307" lon="-98.775575">
+        <ele>2351.737</ele>
+        <time>2024-04-07T21:14:01.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006297" lon="-98.775632">
+        <ele>2351.244</ele>
+        <time>2024-04-07T21:14:06.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006285" lon="-98.775682">
+        <ele>2351.005</ele>
+        <time>2024-04-07T21:14:11.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006270" lon="-98.775730">
+        <ele>2351.215</ele>
+        <time>2024-04-07T21:14:16.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006265" lon="-98.775789">
+        <ele>2351.209</ele>
+        <time>2024-04-07T21:14:21.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006291" lon="-98.775836">
+        <ele>2350.985</ele>
+        <time>2024-04-07T21:14:26.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006339" lon="-98.775853">
+        <ele>2350.890</ele>
+        <time>2024-04-07T21:14:30.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006392" lon="-98.775857">
+        <ele>2350.660</ele>
+        <time>2024-04-07T21:14:35.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006437" lon="-98.775863">
+        <ele>2350.229</ele>
+        <time>2024-04-07T21:14:39.635Z</time>
+      </trkpt>
+      <trkpt lat="20.006485" lon="-98.775859">
+        <ele>2349.912</ele>
+        <time>2024-04-07T21:14:44.635Z</time>
+      </trkpt>
+    </trkseg>
+  </trk></gpx>

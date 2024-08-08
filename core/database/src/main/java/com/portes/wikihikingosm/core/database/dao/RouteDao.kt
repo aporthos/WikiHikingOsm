@@ -13,6 +13,9 @@ interface RouteDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertOrIgnorePhrase(route: RouteEntity): Long
 
+    @Insert
+    suspend fun insertOrIgnorePhrase(route: List<RouteEntity>)
+
     @Transaction
     @Query(
         value = """ 

@@ -8,7 +8,7 @@ import com.portes.wikihikingosm.core.models.Hike
     tableName = "hike",
 )
 data class HikeEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey(autoGenerate = true) val idHike: Long = 0,
     val name: String
 )
 
