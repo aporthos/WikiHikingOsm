@@ -20,11 +20,9 @@ class RouteRepositoryImpl @Inject constructor(
 ) : RouteRepository {
     override fun getRoute(): Flow<List<Route>> = dao.getRoute().map { it.map { it.asModel() } }
 
-    override suspend fun addRoute(idHike: Long): Long {
-        listOf("casa-mike.gpx").map { hike ->
-            parser.parse(context.resources.assets.open(hike))?.let {
-                dao.insertOrIgnorePhrase(it.parsed(idHike))
-            }
+    override suspend fun addRoute(idHike: Long, name: String): Long {
+        parser.parse(context.resources.assets.open(name))?.let {
+            dao.insertOrIgnorePhrase(it.parsed(idHike))
         }
         return 0
     }
@@ -44,5 +42,5 @@ fun Gpx.parsed(idHike: Long): List<RouteEntity> = mutableListOf<RouteEntity>().a
 
 interface RouteRepository {
     fun getRoute(): Flow<List<Route>>
-    suspend fun addRoute(idHike: Long): Long
+    suspend fun addRoute(idHike: Long, name: String): Long
 }

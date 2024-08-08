@@ -27,13 +27,13 @@ class HikingRouteViewModel @Inject constructor(
     val uiState: StateFlow<HikingRouteUiState> = _uiState
 
     init {
-//        addHike()
+        addHike()
         getHike()
     }
 
     private fun addHike() {
         viewModelScope.launch {
-            addHikeUseCase(AddHikeUseCase.Params(Hike("Casa Mike")))
+            addHikeUseCase(AddHikeUseCase.Params(Hike("seneros.gpx")))
         }
     }
 

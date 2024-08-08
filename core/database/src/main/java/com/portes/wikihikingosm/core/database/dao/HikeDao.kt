@@ -12,7 +12,23 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface HikeDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertOrIgnorePhrase(hike: HikeEntity): Long
+    suspend fun insertOrIgnoreHike(hike: HikeEntity): Long
+
+    @Query(
+        value = """
+            SELECT COUNT(*) FROM hike
+            WHERE name LIKE :name
+    """
+    )
+    fun isSavedHike(name: String): Int
+
+    suspend fun canInsertHike(hike: HikeEntity): Long {
+        if (isSavedHike(name = hike.name) == 0) {
+            return insertOrIgnoreHike(hike)
+        }
+        return -1
+    }
+
 
     @Transaction
     @Query(
@@ -23,6 +39,6 @@ interface HikeDao {
     fun getHike(): Flow<List<HikeEntity>>
 
     @Transaction
-    @Query("SELECT * FROM hike WHERE idHike = 1")
+    @Query("SELECT * FROM hike limit 1")
     fun getHikeWithRoute(): Flow<HikeWithRouteRelation>
 }

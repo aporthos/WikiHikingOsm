@@ -18,9 +18,10 @@ class HikeRepositoryImpl @Inject constructor(
         dao.getHikeWithRoute().map { it.asModel() }
 
     override suspend fun addHike(hike: Hike): Long {
-        val idHike = dao.insertOrIgnorePhrase(hike.asEntity())
-        Timber.i("idHike $idHike")
-        routeRepository.addRoute(idHike)
+        val idHike = dao.canInsertHike(hike.asEntity())
+        if (idHike > -1) {
+            routeRepository.addRoute(idHike, hike.name)
+        }
         return idHike
     }
 }
