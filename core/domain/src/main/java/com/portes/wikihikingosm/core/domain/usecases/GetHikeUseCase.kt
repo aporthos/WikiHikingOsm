@@ -15,11 +15,11 @@ import javax.inject.Inject
 class GetHikeUseCase @Inject constructor(
     private val repository: HikeRepository,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
-) : FlowSingleUseCase<None, HikeData>(dispatcher) {
+) : FlowSingleUseCase<Int, HikeData>(dispatcher) {
 
-    override fun execute(params: None): Flow<HikeData> = combine(
-        repository.getHikeWithRoute(),
-        repository.getHikeWithWayPoints()
+    override fun execute(params: Int): Flow<HikeData> = combine(
+        repository.getHikeWithRoute(params),
+        repository.getHikeWithWayPoints(params)
     ) { route, wayPoints ->
         HikeData(route.hike, route.route, wayPoints.wayPoints)
     }

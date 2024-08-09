@@ -37,18 +37,17 @@ class HikingRouteViewModel @Inject constructor(
                 }
             }
         }
-
     }
 
     private fun addHike() {
         viewModelScope.launch {
-            addHikeUseCase(AddHikeUseCase.Params(Hike("pena2.gpx")))
+            addHikeUseCase(AddHikeUseCase.Params(Hike("izta.gpx")))
         }
     }
 
     private fun getHike() {
         viewModelScope.launch {
-            getHikeUseCase(None).collect { hike ->
+            getHikeUseCase(2).collect { hike ->
                 _uiState.update {
                     HikingRouteUiState.Success(
                         hike = hike.hike,

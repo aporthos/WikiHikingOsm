@@ -16,11 +16,11 @@ class HikeRepositoryImpl @Inject constructor(
     private val routeRepository: RouteRepository,
     private val wayPointsRepository: WayPointsRepository,
 ) : HikeRepository {
-    override fun getHikeWithRoute(): Flow<HikeWithRoute> =
-        dao.getHikeWithRoute().map { it.asModel() }
+    override fun getHikeWithRoute(idHike: Int): Flow<HikeWithRoute> =
+        dao.getHikeWithRoute(idHike).map { it.asModel() }
 
-    override fun getHikeWithWayPoints(): Flow<HikeWithWayPoints> =
-        dao.getHikeWithWayPoints().map { it.asModel() }
+    override fun getHikeWithWayPoints(idHike: Int): Flow<HikeWithWayPoints> =
+        dao.getHikeWithWayPoints(idHike).map { it.asModel() }
 
     override fun canHikes(): Flow<Int> = dao.canHikes()
 
@@ -35,8 +35,8 @@ class HikeRepositoryImpl @Inject constructor(
 }
 
 interface HikeRepository {
-    fun getHikeWithRoute(): Flow<HikeWithRoute>
-    fun getHikeWithWayPoints(): Flow<HikeWithWayPoints>
+    fun getHikeWithRoute(idHike: Int): Flow<HikeWithRoute>
+    fun getHikeWithWayPoints(idHike: Int): Flow<HikeWithWayPoints>
     fun canHikes(): Flow<Int>
     suspend fun addHike(hike: Hike): Long
 }

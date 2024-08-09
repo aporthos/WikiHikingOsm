@@ -13,8 +13,8 @@ class LocationOverlayHelper(
     init {
         enableMyLocation()
 //        enableFollowLocation()
-        isOptionsMenuEnabled = false
-
+        isOptionsMenuEnabled = true
+        isDrawAccuracyEnabled = true
         mapView.overlays.add(this)
     }
 }
