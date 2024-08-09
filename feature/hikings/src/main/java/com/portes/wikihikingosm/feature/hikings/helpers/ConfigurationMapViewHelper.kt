@@ -1,4 +1,4 @@
-package com.portes.wikihikingosm.feature.hikings
+package com.portes.wikihikingosm.feature.hikings.helpers
 
 import android.graphics.Rect
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory

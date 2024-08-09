@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.portes.wikihikingosm.core.database.WikiHikingDatabase
 import com.portes.wikihikingosm.core.database.dao.HikeDao
 import com.portes.wikihikingosm.core.database.dao.RouteDao
+import com.portes.wikihikingosm.core.database.dao.WayPointsDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,4 +39,10 @@ object DatabaseModule {
     fun providesRouteDao(
         database: WikiHikingDatabase,
     ): RouteDao = database.routeDao()
+
+    @Provides
+    @Singleton
+    fun providesWayPointsDao(
+        database: WikiHikingDatabase,
+    ): WayPointsDao = database.wayPointsDao()
 }

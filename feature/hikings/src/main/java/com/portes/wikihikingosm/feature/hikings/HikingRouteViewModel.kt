@@ -4,10 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.portes.wikihikingosm.core.common.domain.None
 import com.portes.wikihikingosm.core.domain.usecases.AddHikeUseCase
+import com.portes.wikihikingosm.core.domain.usecases.CanExistHikesUseCase
 import com.portes.wikihikingosm.core.domain.usecases.GetHikeUseCase
-import com.portes.wikihikingosm.core.domain.usecases.GetRouteUseCase
 import com.portes.wikihikingosm.core.models.Hike
 import com.portes.wikihikingosm.core.models.Route
+import com.portes.wikihikingosm.core.models.WayPoints
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,6 +22,7 @@ import javax.inject.Inject
 class HikingRouteViewModel @Inject constructor(
     private val addHikeUseCase: AddHikeUseCase,
     private val getHikeUseCase: GetHikeUseCase,
+    private val canExistHikesUseCase: CanExistHikesUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<HikingRouteUiState>(HikingRouteUiState.Loading)
@@ -28,22 +30,30 @@ class HikingRouteViewModel @Inject constructor(
 
     init {
         addHike()
-        getHike()
+        viewModelScope.launch {
+            canExistHikesUseCase(None).collect {
+                if (it > 0) {
+                    getHike()
+                }
+            }
+        }
+
     }
 
     private fun addHike() {
         viewModelScope.launch {
-            addHikeUseCase(AddHikeUseCase.Params(Hike("seneros.gpx")))
+            addHikeUseCase(AddHikeUseCase.Params(Hike("pena2.gpx")))
         }
     }
 
     private fun getHike() {
         viewModelScope.launch {
-            getHikeUseCase(None).collect { route ->
+            getHikeUseCase(None).collect { hike ->
                 _uiState.update {
                     HikingRouteUiState.Success(
-                        hike = route.hike,
-                        route = route.route.toListGeoPoint()
+                        hike = hike.hike,
+                        route = hike.route,
+                        wayPoints = hike.wayPoints
                     )
                 }
             }
@@ -56,14 +66,20 @@ fun Route.toGeoPoint() = GeoPoint(
     longitude
 )
 
+fun WayPoints.toGeoPoint() = GeoPoint(
+    latitude,
+    longitude
+)
+
 fun List<Route>.toListGeoPoint(): List<GeoPoint> = map {
     it.toGeoPoint()
 }
 
 sealed interface HikingRouteUiState {
     data class Success(
-        val route: List<GeoPoint> = emptyList(),
+        val route: List<Route> = emptyList(),
         val hike: Hike,
+        val wayPoints: List<WayPoints>,
     ) : HikingRouteUiState
 
     object Loading : HikingRouteUiState

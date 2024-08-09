@@ -1,8 +1,8 @@
 package com.portes.wikihikingosm.core.models
 
-data class Route(
-    val idHikeRoute: Long,
+data class WayPoints(
+    val name: String,
     val latitude: Double,
     val longitude: Double,
-    val elevation: Double
+    val idHikeRoute: Long,
 )

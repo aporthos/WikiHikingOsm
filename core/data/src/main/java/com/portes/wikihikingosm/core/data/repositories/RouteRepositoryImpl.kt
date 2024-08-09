@@ -34,7 +34,8 @@ fun Gpx.parsed(idHike: Long): List<RouteEntity> = mutableListOf<RouteEntity>().a
             RouteEntity(
                 latitude = it.latitude,
                 longitude = it.longitude,
-                idHikeRoute = idHike
+                idHikeRoute = idHike,
+                elevation = it.elevation
             )
         )
     }

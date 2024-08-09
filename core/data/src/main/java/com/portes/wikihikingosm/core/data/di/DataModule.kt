@@ -4,6 +4,8 @@ import com.portes.wikihikingosm.core.data.repositories.HikeRepository
 import com.portes.wikihikingosm.core.data.repositories.HikeRepositoryImpl
 import com.portes.wikihikingosm.core.data.repositories.RouteRepository
 import com.portes.wikihikingosm.core.data.repositories.RouteRepositoryImpl
+import com.portes.wikihikingosm.core.data.repositories.WayPointsRepository
+import com.portes.wikihikingosm.core.data.repositories.WayPointsRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -26,6 +28,11 @@ object DataModule {
         fun bindsHikeRepository(
             repository: HikeRepositoryImpl,
         ): HikeRepository
+
+        @Binds
+        fun bindsWayPointsRepositoryRepository(
+            repository: WayPointsRepositoryImpl,
+        ): WayPointsRepository
     }
 
     @Provides

@@ -3,26 +3,32 @@ package com.portes.wikihikingosm.feature.hikings
 import android.Manifest
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.portes.wikihikingosm.core.common.extensions.hasLocationPermissions
 import com.portes.wikihikingosm.core.common.extensions.multiplePermissionsLauncher
+import com.portes.wikihikingosm.core.models.Route
 import com.portes.wikihikingosm.feature.hikings.databinding.FragmentHikingRouteBinding
+import com.portes.wikihikingosm.feature.hikings.helpers.ConfigurationMapItems
+import com.portes.wikihikingosm.feature.hikings.helpers.ConfigurationMapViewHelper
+import com.portes.wikihikingosm.feature.hikings.helpers.LocationOverlayHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.overlay.Polyline
 import timber.log.Timber
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HikingRouteFragment : Fragment(R.layout.fragment_hiking_route) {
 
     private val viewModel: HikingRouteViewModel by viewModels()
+
+    @Inject
+    lateinit var configurationMapItems: ConfigurationMapItems
 
     private val requestPermissionLauncher =
         multiplePermissionsLauncher(allGranted = {
@@ -46,6 +52,7 @@ class HikingRouteFragment : Fragment(R.layout.fragment_hiking_route) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         ConfigurationMapViewHelper(binding.contentMapView)
+        configurationMapItems.initMap(binding.contentMapView)
         if (requireContext().hasLocationPermissions.not()) {
             requestPermissionLauncher.launch(
                 arrayOf(
@@ -61,10 +68,10 @@ class HikingRouteFragment : Fragment(R.layout.fragment_hiking_route) {
             viewModel.uiState.collect { state ->
                 when (state) {
                     is HikingRouteUiState.Success -> {
-                        Timber.i("route name ${state.hike.name}")
                         Timber.i("route size ${state.route.size}")
                         Timber.i("route ${state.route}")
-                        configurationHikePath(state.route)
+                        configurationHikeRoute(state.route)
+                        configurationMapItems.addWayPoints(state.wayPoints)
                     }
 
                     HikingRouteUiState.Loading -> {
@@ -75,16 +82,14 @@ class HikingRouteFragment : Fragment(R.layout.fragment_hiking_route) {
         }
     }
 
-    private fun configurationHikePath(route: List<GeoPoint>) {
-        val mapController = binding.contentMapView.controller
-        val startPoint = route.first()
-
-        mapController.setZoom(20.0)
-        mapController.setCenter(startPoint)
-        val line = Polyline()
-        line.setPoints(route)
-        binding.contentMapView.overlays.add(line)
+    private fun configurationHikeRoute(route: List<Route>) {
+        val middle = route.toListGeoPoint().size / 2
+        configurationMapItems.addRoute(route.toListGeoPoint().take(middle + 1), 0x009688)
+        configurationMapItems.addRoute(route.toListGeoPoint().takeLast(middle + 1), 0xFFA000)
+        configurationMapItems.addElevations(route)
+        configurationMapItems.settingsMap(route)
     }
+
 
     override fun onResume() {
         super.onResume()

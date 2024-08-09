@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.portes.wikihikingosm.core.database.entities.HikeEntity
 import com.portes.wikihikingosm.core.database.entities.HikeWithRouteRelation
+import com.portes.wikihikingosm.core.database.entities.HikeWithWayPointsRelation
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -29,16 +30,15 @@ interface HikeDao {
         return -1
     }
 
-
     @Transaction
-    @Query(
-        value = """ 
-            SELECT * FROM hike
-    """
-    )
-    fun getHike(): Flow<List<HikeEntity>>
-
-    @Transaction
-    @Query("SELECT * FROM hike limit 1")
+    @Query("SELECT * FROM hike where idHike = 1 order by idHike desc limit 1 ")
     fun getHikeWithRoute(): Flow<HikeWithRouteRelation>
+
+    @Transaction
+    @Query("SELECT * FROM hike where idHike = 1 order by idHike desc limit 1 ")
+    fun getHikeWithWayPoints(): Flow<HikeWithWayPointsRelation>
+
+    @Transaction
+    @Query("SELECT COUNT(*) FROM hike")
+    fun canHikes(): Flow<Int>
 }
