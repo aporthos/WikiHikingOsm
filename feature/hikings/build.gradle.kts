@@ -35,7 +35,13 @@ android {
 
     buildFeatures {
         viewBinding = true
+        compose = true
     }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.3"
+    }
+
 }
 
 dependencies {
@@ -44,7 +50,13 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
 
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
+    implementation(platform("androidx.compose:compose-bom:2024.02.02"))
+    implementation("androidx.compose.material3:material3")
+
     implementation("com.google.dagger:hilt-android:2.49")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     kapt("com.google.dagger:hilt-android-compiler:2.44.2")
 
     implementation("org.osmdroid:osmdroid-android:6.1.18")

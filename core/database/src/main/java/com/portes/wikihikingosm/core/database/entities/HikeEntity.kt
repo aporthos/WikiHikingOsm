@@ -13,9 +13,11 @@ data class HikeEntity(
 )
 
 fun HikeEntity.asModel() = Hike(
-    name = name
+    name = name,
+    idHike = idHike
 )
 
 fun Hike.asEntity() = HikeEntity(
-    name = name
+    name = name,
+    idHike = idHike
 )

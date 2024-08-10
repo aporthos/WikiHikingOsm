@@ -3,6 +3,7 @@ package com.portes.wikihikingosm.core.common.extensions
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
@@ -13,6 +14,18 @@ import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 fun Fragment.multiplePermissionsLauncher(
+    allGranted: () -> Unit,
+    onReject: () -> Unit,
+): ActivityResultLauncher<Array<String>> =
+    registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+        if (permissions.entries.all { it.value }) {
+            allGranted()
+        } else {
+            onReject()
+        }
+    }
+
+fun AppCompatActivity.multiplePermissionsLauncher(
     allGranted: () -> Unit,
     onReject: () -> Unit,
 ): ActivityResultLauncher<Array<String>> =

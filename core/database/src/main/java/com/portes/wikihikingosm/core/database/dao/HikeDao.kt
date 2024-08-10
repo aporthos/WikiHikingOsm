@@ -32,13 +32,13 @@ interface HikeDao {
 
     @Transaction
     @Query("SELECT * FROM hike where idHike = :idHike")
-    fun getHikeWithRoute(idHike: Int): Flow<HikeWithRouteRelation>
+    fun getHikeWithRoute(idHike: Long): Flow<HikeWithRouteRelation>
 
     @Transaction
     @Query("SELECT * FROM hike where idHike = :idHike")
-    fun getHikeWithWayPoints(idHike: Int): Flow<HikeWithWayPointsRelation>
+    fun getHikeWithWayPoints(idHike: Long): Flow<HikeWithWayPointsRelation>
 
     @Transaction
-    @Query("SELECT COUNT(*) FROM hike")
-    fun canHikes(): Flow<Int>
+    @Query("SELECT * FROM hike")
+    fun getHikes(): Flow<List<HikeEntity>>
 }
