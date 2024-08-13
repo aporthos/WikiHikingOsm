@@ -1,4 +1,4 @@
-package com.portes.wikihikingosm.feature.hikings
+package com.portes.wikihikingosm.feature.routes
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,20 +37,6 @@ class HikingRouteViewModel @Inject constructor(
         initialValue = HikingRouteUiState.Loading,
         started = SharingStarted.WhileSubscribed()
     )
-}
-
-fun Route.toGeoPoint() = GeoPoint(
-    latitude,
-    longitude
-)
-
-fun WayPoints.toGeoPoint() = GeoPoint(
-    latitude,
-    longitude
-)
-
-fun List<Route>.toListGeoPoint(): List<GeoPoint> = map {
-    it.toGeoPoint()
 }
 
 sealed interface HikingRouteUiState {

@@ -1,4 +1,4 @@
-package com.portes.wikihikingosm.feature.hikings.models
+package com.portes.wikihikingosm.feature.routes.models
 
 import org.osmdroid.util.GeoPoint
 

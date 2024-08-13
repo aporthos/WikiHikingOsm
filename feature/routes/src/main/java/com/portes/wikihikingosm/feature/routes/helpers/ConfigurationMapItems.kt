@@ -1,16 +1,14 @@
-package com.portes.wikihikingosm.feature.hikings.helpers
+package com.portes.wikihikingosm.feature.routes.helpers
 
 import android.content.res.Resources
 import android.graphics.Paint
 import androidx.core.content.res.ResourcesCompat
 import com.portes.wikihikingosm.core.models.Route
 import com.portes.wikihikingosm.core.models.WayPoints
-import com.portes.wikihikingosm.feature.hikings.R
-import com.portes.wikihikingosm.feature.hikings.models.CustomMarker
-import com.portes.wikihikingosm.feature.hikings.models.ElevationMarker
-import com.portes.wikihikingosm.feature.hikings.models.WayPointMarker
-import com.portes.wikihikingosm.feature.hikings.toGeoPoint
-import com.portes.wikihikingosm.feature.hikings.toListGeoPoint
+import com.portes.wikihikingosm.core.designsystem.R
+import com.portes.wikihikingosm.feature.routes.models.CustomMarker
+import com.portes.wikihikingosm.feature.routes.models.ElevationMarker
+import com.portes.wikihikingosm.feature.routes.models.WayPointMarker
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
@@ -118,4 +116,18 @@ class ConfigurationMapItems @Inject constructor(
         path.setPoints(route)
         mapView?.overlays?.add(path)
     }
+}
+
+fun Route.toGeoPoint() = GeoPoint(
+    latitude,
+    longitude
+)
+
+fun WayPoints.toGeoPoint() = GeoPoint(
+    latitude,
+    longitude
+)
+
+fun List<Route>.toListGeoPoint(): List<GeoPoint> = map {
+    it.toGeoPoint()
 }

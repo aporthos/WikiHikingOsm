@@ -11,9 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.portes.wikihiking.ui.theme.WikiHikingTheme
 import com.portes.wikihikingosm.feature.hikings.HikingRoute
-import com.portes.wikihikingosm.feature.hikings.HikingRouteActivity
-import com.portes.wikihikingosm.feature.hikings.HikingRoutePref
-import com.portes.wikihikingosm.feature.hikings.HikingRouteViewModel.Companion.ID_HIKE
+import com.portes.wikihikingosm.core.domain.usecases.HikingRoutePref
+import com.portes.wikihikingosm.feature.routes.HikingRouteActivity
+import com.portes.wikihikingosm.feature.routes.HikingRouteViewModel.Companion.ID_HIKE
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

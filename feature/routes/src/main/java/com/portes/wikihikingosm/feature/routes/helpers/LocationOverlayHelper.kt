@@ -1,4 +1,4 @@
-package com.portes.wikihikingosm.feature.hikings.helpers
+package com.portes.wikihikingosm.feature.routes.helpers
 
 import android.content.Context
 import org.osmdroid.views.MapView

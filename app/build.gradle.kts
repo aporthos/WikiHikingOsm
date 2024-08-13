@@ -72,6 +72,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:domain"))
     implementation(project(":feature:hikings"))
+    implementation(project(":feature:routes"))
 
 }
 

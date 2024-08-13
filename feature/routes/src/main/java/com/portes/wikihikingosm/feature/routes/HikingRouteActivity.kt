@@ -1,24 +1,24 @@
-package com.portes.wikihikingosm.feature.hikings
+package com.portes.wikihikingosm.feature.routes
 
 import android.Manifest
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import androidx.viewbinding.ViewBinding
 import com.portes.wikihikingosm.core.common.extensions.hasLocationPermissions
 import com.portes.wikihikingosm.core.common.extensions.multiplePermissionsLauncher
 import com.portes.wikihikingosm.core.common.extensions.viewBinding
 import com.portes.wikihikingosm.core.models.Route
-import com.portes.wikihikingosm.feature.hikings.HikingRouteViewModel.Companion.ID_HIKE
-import com.portes.wikihikingosm.feature.hikings.databinding.ActivityHikingRouteBinding
-import com.portes.wikihikingosm.feature.hikings.helpers.ConfigurationMapItems
-import com.portes.wikihikingosm.feature.hikings.helpers.ConfigurationMapViewHelper
-import com.portes.wikihikingosm.feature.hikings.helpers.LocationOverlayHelper
+import com.portes.wikihikingosm.feature.routes.databinding.ActivityHikingRouteBinding
+import com.portes.wikihikingosm.core.domain.usecases.HikingRoutePref
+import com.portes.wikihikingosm.feature.routes.HikingRouteViewModel.Companion.ID_HIKE
+import com.portes.wikihikingosm.feature.routes.helpers.ConfigurationMapItems
+import com.portes.wikihikingosm.feature.routes.helpers.ConfigurationMapViewHelper
+import com.portes.wikihikingosm.feature.routes.helpers.LocationOverlayHelper
+import com.portes.wikihikingosm.feature.routes.helpers.toListGeoPoint
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
@@ -51,7 +51,11 @@ class HikingRouteActivity : AppCompatActivity() {
 
     private val requestPermissionLauncher =
         multiplePermissionsLauncher(allGranted = {
-            locationOverlayHelper = LocationOverlayHelper(this, binding.contentMapView)
+            locationOverlayHelper =
+                LocationOverlayHelper(
+                    this,
+                    binding.contentMapView
+                )
         }, onReject = {})
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,7 +76,11 @@ class HikingRouteActivity : AppCompatActivity() {
                 )
             )
         } else {
-            locationOverlayHelper = LocationOverlayHelper(this, binding.contentMapView)
+            locationOverlayHelper =
+                LocationOverlayHelper(
+                    this,
+                    binding.contentMapView
+                )
         }
 
         onBackPressedDispatcher.addCallback(this, backPressedCallback)

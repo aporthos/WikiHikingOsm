@@ -1,4 +1,4 @@
-package com.portes.wikihikingosm.feature.hikings
+package com.portes.wikihikingosm.core.domain.usecases
 
 import android.content.SharedPreferences
 import androidx.core.content.edit

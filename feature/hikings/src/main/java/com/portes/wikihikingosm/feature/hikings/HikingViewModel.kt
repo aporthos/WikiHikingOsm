@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.portes.wikihikingosm.core.common.domain.None
 import com.portes.wikihikingosm.core.domain.usecases.AddHikeUseCase
 import com.portes.wikihikingosm.core.domain.usecases.GetHikesUseCase
+import com.portes.wikihikingosm.core.domain.usecases.HikingRoutePref
 import com.portes.wikihikingosm.core.models.Hike
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
