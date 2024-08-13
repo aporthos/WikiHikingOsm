@@ -1,4 +1,4 @@
-package com.portes.wikihiking.ui.theme
+package com.portes.wikihikingosm.core.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -42,6 +42,7 @@ dependencies {
     implementation ("com.github.ticofab:android-gpx-parser:2.3.1")
 
     implementation("com.jakewharton.timber:timber:5.0.1")
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
 
     implementation(project(":core:database"))
     implementation(project(":core:models"))

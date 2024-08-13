@@ -3,6 +3,7 @@
     <application>
         <activity
             android:name="com.portes.wikihikingosm.feature.routes.HikingRouteActivity"
+            android:theme="@style/App.Theme.WikiHikingOsm"
             android:exported="false" />
     </application>
 </manifest>

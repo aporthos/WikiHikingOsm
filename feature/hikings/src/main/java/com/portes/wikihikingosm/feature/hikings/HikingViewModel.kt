@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
 
 @HiltViewModel
@@ -45,14 +46,78 @@ class HikingViewModel @Inject constructor(
 
     private fun addHike() {
         viewModelScope.launch {
-            addHikeUseCase(AddHikeUseCase.Params(Hike(name = "izta.gpx")))
-            addHikeUseCase(AddHikeUseCase.Params(Hike(name = "barranca.gpx")))
-            addHikeUseCase(AddHikeUseCase.Params(Hike(name = "cuervo.gpx")))
-            addHikeUseCase(AddHikeUseCase.Params(Hike(name = "cuervo2.gpx")))
-            addHikeUseCase(AddHikeUseCase.Params(Hike(name = "pena.gpx")))
-            addHikeUseCase(AddHikeUseCase.Params(Hike(name = "pena2.gpx")))
-            addHikeUseCase(AddHikeUseCase.Params(Hike(name = "iztaccihuatl_cumbre.gpx")))
-            addHikeUseCase(AddHikeUseCase.Params(Hike(name = "cumbre_iztaccihuatl.gpx")))
+            addHikeUseCase(
+                AddHikeUseCase.Params(
+                    Hike(
+                        name = "izta.gpx",
+                        startPoint = GeoPoint(1.0, 1.1),
+                        distanceTotal = 0.0
+                    )
+                )
+            )
+            addHikeUseCase(
+                AddHikeUseCase.Params(
+                    Hike(
+                        name = "barranca.gpx",
+                        startPoint = GeoPoint(1.0, 1.1),
+                        distanceTotal = 0.0
+                    )
+                )
+            )
+            addHikeUseCase(
+                AddHikeUseCase.Params(
+                    Hike(
+                        name = "cuervo.gpx",
+                        startPoint = GeoPoint(1.0, 1.1),
+                        distanceTotal = 0.0
+                    )
+                )
+            )
+            addHikeUseCase(
+                AddHikeUseCase.Params(
+                    Hike(
+                        name = "cuervo2.gpx",
+                        startPoint = GeoPoint(1.0, 1.1),
+                        distanceTotal = 0.0
+                    )
+                )
+            )
+            addHikeUseCase(
+                AddHikeUseCase.Params(
+                    Hike(
+                        name = "pena.gpx",
+                        startPoint = GeoPoint(1.0, 1.1),
+                        distanceTotal = 0.0
+                    )
+                )
+            )
+            addHikeUseCase(
+                AddHikeUseCase.Params(
+                    Hike(
+                        name = "pena2.gpx",
+                        startPoint = GeoPoint(1.0, 1.1),
+                        distanceTotal = 0.0
+                    )
+                )
+            )
+            addHikeUseCase(
+                AddHikeUseCase.Params(
+                    Hike(
+                        name = "iztaccihuatl_cumbre.gpx",
+                        startPoint = GeoPoint(1.0, 1.1),
+                        distanceTotal = 0.0
+                    )
+                )
+            )
+            addHikeUseCase(
+                AddHikeUseCase.Params(
+                    Hike(
+                        name = "cumbre_iztaccihuatl.gpx",
+                        startPoint = GeoPoint(1.0, 1.1),
+                        distanceTotal = 0.0
+                    )
+                )
+            )
         }
     }
 }
