@@ -5,12 +5,16 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
 import com.portes.wikihikingosm.core.common.extensions.hasLocationPermissions
 import com.portes.wikihikingosm.core.common.extensions.multiplePermissionsLauncher
+import com.portes.wikihikingosm.core.common.extensions.viewBinding
 import com.portes.wikihikingosm.core.models.Route
+import com.portes.wikihikingosm.feature.hikings.HikingRouteViewModel.Companion.ID_HIKE
 import com.portes.wikihikingosm.feature.hikings.databinding.ActivityHikingRouteBinding
 import com.portes.wikihikingosm.feature.hikings.helpers.ConfigurationMapItems
 import com.portes.wikihikingosm.feature.hikings.helpers.ConfigurationMapViewHelper
@@ -30,7 +34,20 @@ class HikingRouteActivity : AppCompatActivity() {
     @Inject
     lateinit var configurationMapItems: ConfigurationMapItems
 
+    @Inject
+    lateinit var hikingRoutePref: HikingRoutePref
+
     private var locationOverlayHelper: LocationOverlayHelper? = null
+    private var idHike = 0L
+
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (hikingRoutePref.isStartHiking() != 0L) {
+                return
+            }
+            finish()
+        }
+    }
 
     private val requestPermissionLauncher =
         multiplePermissionsLauncher(allGranted = {
@@ -42,8 +59,10 @@ class HikingRouteActivity : AppCompatActivity() {
         Configuration.getInstance()
             .load(this, getSharedPreferences("map", Context.MODE_PRIVATE))
         setContentView(binding.root)
+
         ConfigurationMapViewHelper(binding.contentMapView)
         configurationMapItems.initMap(binding.contentMapView)
+        idHike = intent?.extras?.getLong(ID_HIKE) ?: 0
 
         if (hasLocationPermissions.not()) {
             requestPermissionLauncher.launch(
@@ -55,6 +74,8 @@ class HikingRouteActivity : AppCompatActivity() {
         } else {
             locationOverlayHelper = LocationOverlayHelper(this, binding.contentMapView)
         }
+
+        onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
         lifecycleScope.launch {
             viewModel.uiState.collect { state ->
@@ -71,6 +92,20 @@ class HikingRouteActivity : AppCompatActivity() {
             }
         }
 
+        if (hikingRoutePref.isStartHiking() != 0L) {
+            binding.startHikingButton.isVisible = false
+            binding.stopHikingButton.isVisible = true
+            binding.locationFab.isVisible = true
+        } else {
+            binding.startHikingButton.isVisible = true
+            binding.locationFab.isVisible = false
+            binding.stopHikingButton.isVisible = false
+        }
+
+        listeners()
+    }
+
+    private fun listeners() {
         binding.locationFab.setOnClickListener {
             val mapController = binding.contentMapView.controller
             val location = locationOverlayHelper?.myLocation
@@ -78,8 +113,20 @@ class HikingRouteActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     mapController.setCenter(location)
                     mapController.animateTo(location)
+                    mapController.setZoom(2.0)
                 }
             }
+        }
+
+        binding.startHikingButton.setOnClickListener {
+            hikingRoutePref.startHiking(idHike = idHike)
+            binding.startHikingButton.isVisible = false
+            binding.stopHikingButton.isVisible = true
+            binding.locationFab.isVisible = true
+        }
+        binding.stopHikingButton.setOnClickListener {
+            hikingRoutePref.startHiking(idHike = 0)
+            finish()
         }
     }
 
@@ -100,10 +147,4 @@ class HikingRouteActivity : AppCompatActivity() {
         super.onPause()
         binding.contentMapView.onPause()
     }
-}
-
-inline fun <T : ViewBinding> AppCompatActivity.viewBinding(
-    crossinline bindingInflater: (LayoutInflater) -> T
-) = lazy(LazyThreadSafetyMode.NONE) {
-    bindingInflater.invoke(layoutInflater)
 }

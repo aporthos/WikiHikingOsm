@@ -16,32 +16,36 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.portes.wikihikingosm.core.models.Hike
-
 @Composable
 fun HikingRoute(
     viewModel: HikingViewModel = hiltViewModel(),
+    onClick: (Long) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    HikingRoute(uiState)
+    val startingHiking by viewModel.isStartHiking.collectAsStateWithLifecycle()
+    HikingRoute(uiState, startingHiking, onClick)
 }
 
 @Composable
 fun HikingRoute(
-    uiState: HikingUiState
+    uiState: HikingUiState,
+    startingHiking: Long,
+    onClick: (Long) -> Unit
 ) {
-    val context = LocalContext.current
     when (uiState) {
         HikingUiState.Loading -> {
 
         }
 
         is HikingUiState.Success -> {
+            if (startingHiking != 0L) {
+                onClick(startingHiking)
+            }
+
             LazyColumn {
                 items(items = uiState.hikes, key = { it.idHike }) { hike ->
                     HikingItem(hike) {
-                        val intent = Intent(context, HikingRouteActivity::class.java)
-                        intent.putExtra("ID_HIKE", hike.idHike)
-                        context.startActivity(intent)
+                        onClick(hike.idHike)
                     }
                 }
             }

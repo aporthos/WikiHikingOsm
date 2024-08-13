@@ -9,6 +9,7 @@ import com.portes.wikihikingosm.core.models.Hike
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -18,11 +19,20 @@ import javax.inject.Inject
 class HikingViewModel @Inject constructor(
     getHikesUseCase: GetHikesUseCase,
     private val addHikeUseCase: AddHikeUseCase,
+    private val hikingRoutePref: HikingRoutePref
 ) : ViewModel() {
 
     init {
         addHike()
     }
+
+    val isStartHiking = flow {
+        emit(hikingRoutePref.isStartHiking())
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = 0,
+    )
 
     val uiState: StateFlow<HikingUiState> = getHikesUseCase(None).map {
         HikingUiState.Success(it)

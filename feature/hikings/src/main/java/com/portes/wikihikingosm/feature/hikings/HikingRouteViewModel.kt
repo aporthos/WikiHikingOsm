@@ -21,7 +21,11 @@ class HikingRouteViewModel @Inject constructor(
     getHikeUseCase: GetHikeUseCase,
 ) : ViewModel() {
 
-    private val idHike: Long = savedStateHandle["ID_HIKE"] ?: 0
+    companion object {
+        const val ID_HIKE = "ID_HIKE"
+    }
+
+    private val idHike: Long = savedStateHandle[ID_HIKE] ?: 0
 
     val uiState: StateFlow<HikingRouteUiState> = getHikeUseCase(idHike).map {
         HikingRouteUiState.Success(
