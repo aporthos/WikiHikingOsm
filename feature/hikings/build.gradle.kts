@@ -60,6 +60,8 @@ dependencies {
 
     implementation("com.jakewharton.timber:timber:5.0.1")
 
+    implementation("com.airbnb.android:lottie-compose:6.0.1")
+
     implementation(project(":core:domain"))
     implementation(project(":core:common"))
     implementation(project(":core:models"))

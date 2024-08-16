@@ -3,14 +3,18 @@ package com.portes.wikihikingosm.feature.hikings
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -22,6 +26,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -29,6 +36,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.portes.wikihikingosm.core.common.extensions.toKm
 import com.portes.wikihikingosm.core.models.Hike
 import com.portes.wikihikingosm.core.designsystem.R
@@ -43,6 +55,7 @@ fun HikingRoute(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val startingHiking by viewModel.isStartHiking.collectAsStateWithLifecycle()
+    var isShowButtonAdd by remember { mutableStateOf(true) }
 
     Scaffold(
         topBar = {
@@ -54,9 +67,12 @@ fun HikingRoute(
             })
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {}) {
-                Icon(Icons.Filled.Add, "")
+            if (isShowButtonAdd) {
+                FloatingActionButton(onClick = {}) {
+                    Icon(Icons.Filled.Add, "")
+                }
             }
+
         }
     ) { paddingValues ->
         HikingRoute(
@@ -70,6 +86,9 @@ fun HikingRoute(
                 val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
                 mapIntent.setPackage("com.google.android.apps.maps")
                 context.startActivity(mapIntent)
+            },
+            isShowButtonAdd = {
+                isShowButtonAdd = !it
             }
         )
     }
@@ -81,7 +100,8 @@ fun HikingRoute(
     uiState: HikingUiState,
     startingHiking: Long,
     onClick: (Long) -> Unit,
-    onGoStartPoint: (GeoPoint) -> Unit
+    onGoStartPoint: (GeoPoint) -> Unit,
+    isShowButtonAdd: (Boolean) -> Unit
 ) {
 
     when (uiState) {
@@ -94,14 +114,57 @@ fun HikingRoute(
                 onClick(startingHiking)
             }
 
-            LazyColumn(modifier) {
-                items(items = uiState.hikes, key = { it.idHike }) { hike ->
-                    HikingItem(
-                        hike = hike,
-                        onClick = { onClick(hike.idHike) },
-                        onGoStartPoint = onGoStartPoint
-                    )
-                }
+            isShowButtonAdd(uiState.hikes.isEmpty())
+            HikingItems(
+                modifier = modifier,
+                hikes = uiState.hikes,
+                onGoStartPoint = onGoStartPoint,
+                onClick = onClick
+            )
+        }
+    }
+}
+
+@Composable
+fun HikingItems(
+    modifier: Modifier,
+    hikes: List<Hike>,
+    onGoStartPoint: (GeoPoint) -> Unit,
+    onClick: (Long) -> Unit
+) {
+    if (hikes.isEmpty()) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(com.portes.wikihikingosm.feature.hikings.R.raw.empty_hike))
+            val progress by animateLottieCompositionAsState(
+                composition = composition,
+                iterations = LottieConstants.IterateForever,
+            )
+
+            Row {
+                LottieAnimation(
+                    modifier = Modifier
+                        .size(250.dp),
+                    composition = composition,
+                    progress = { progress },
+                )
+            }
+            Text(text = "Aun no tienes caminatas :(")
+            Button(onClick = { /*TODO*/ }) {
+                Text(text = "Agregar caminata")
+            }
+        }
+    } else {
+        LazyColumn(modifier) {
+            items(items = hikes, key = { it.idHike }) { hike ->
+                HikingItem(
+                    hike = hike,
+                    onClick = { onClick(hike.idHike) },
+                    onGoStartPoint = onGoStartPoint
+                )
             }
         }
     }

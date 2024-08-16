@@ -8,6 +8,7 @@ import com.portes.wikihikingosm.core.models.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ticofab.androidgpxparser.parser.domain.Gpx
 import io.ticofab.androidgpxparser.parser.domain.TrackPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,6 +30,7 @@ class ImportViewModel @Inject constructor(
             viewModelScope.launch {
                 addHikeUseCase(AddHikeUseCase.Params(getHike(it)))
                     .onSuccess {
+                        delay(5_000)
                         _hikingSaveUiState.update { HikingSaveUiState.Success }
                     }.onFailure {
                         _hikingSaveUiState.update { HikingSaveUiState.Error }
