@@ -6,5 +6,6 @@ data class Hike(
     val idHike: Long = 0,
     val name: String,
     val startPoint: GeoPoint,
-    val distanceTotal: Double
+    val distanceTotal: Double,
+    val route: List<Route> = emptyList()
 )

@@ -20,13 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HikingViewModel @Inject constructor(
     getHikesUseCase: GetHikesUseCase,
-    private val addHikeUseCase: AddHikeUseCase,
     private val hikingRoutePref: HikingRoutePref
 ) : ViewModel() {
-
-    init {
-        addHike()
-    }
 
     val isStartHiking = flow {
         emit(hikingRoutePref.isStartHiking())
@@ -43,83 +38,6 @@ class HikingViewModel @Inject constructor(
         initialValue = HikingUiState.Loading,
         started = SharingStarted.WhileSubscribed()
     )
-
-    private fun addHike() {
-        viewModelScope.launch {
-            addHikeUseCase(
-                AddHikeUseCase.Params(
-                    Hike(
-                        name = "izta.gpx",
-                        startPoint = GeoPoint(1.0, 1.1),
-                        distanceTotal = 0.0
-                    )
-                )
-            )
-            addHikeUseCase(
-                AddHikeUseCase.Params(
-                    Hike(
-                        name = "barranca.gpx",
-                        startPoint = GeoPoint(1.0, 1.1),
-                        distanceTotal = 0.0
-                    )
-                )
-            )
-            addHikeUseCase(
-                AddHikeUseCase.Params(
-                    Hike(
-                        name = "cuervo.gpx",
-                        startPoint = GeoPoint(1.0, 1.1),
-                        distanceTotal = 0.0
-                    )
-                )
-            )
-            addHikeUseCase(
-                AddHikeUseCase.Params(
-                    Hike(
-                        name = "cuervo2.gpx",
-                        startPoint = GeoPoint(1.0, 1.1),
-                        distanceTotal = 0.0
-                    )
-                )
-            )
-            addHikeUseCase(
-                AddHikeUseCase.Params(
-                    Hike(
-                        name = "pena.gpx",
-                        startPoint = GeoPoint(1.0, 1.1),
-                        distanceTotal = 0.0
-                    )
-                )
-            )
-            addHikeUseCase(
-                AddHikeUseCase.Params(
-                    Hike(
-                        name = "pena2.gpx",
-                        startPoint = GeoPoint(1.0, 1.1),
-                        distanceTotal = 0.0
-                    )
-                )
-            )
-            addHikeUseCase(
-                AddHikeUseCase.Params(
-                    Hike(
-                        name = "iztaccihuatl_cumbre.gpx",
-                        startPoint = GeoPoint(1.0, 1.1),
-                        distanceTotal = 0.0
-                    )
-                )
-            )
-            addHikeUseCase(
-                AddHikeUseCase.Params(
-                    Hike(
-                        name = "cumbre_iztaccihuatl.gpx",
-                        startPoint = GeoPoint(1.0, 1.1),
-                        distanceTotal = 0.0
-                    )
-                )
-            )
-        }
-    }
 }
 
 sealed interface HikingUiState {

@@ -11,10 +11,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface RouteDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertOrIgnorePhrase(route: RouteEntity): Long
+    suspend fun insertOrIgnoreRoute(route: RouteEntity): Long
 
     @Insert
-    suspend fun insertOrIgnorePhrase(route: List<RouteEntity>)
+    suspend fun insertOrIgnoreRoute(route: List<RouteEntity>)
 
     @Transaction
     @Query(

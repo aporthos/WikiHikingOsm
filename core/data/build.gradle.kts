@@ -39,10 +39,7 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.49")
     kapt("com.google.dagger:hilt-android-compiler:2.44.2")
 
-    implementation ("com.github.ticofab:android-gpx-parser:2.3.1")
-
     implementation("com.jakewharton.timber:timber:5.0.1")
-    implementation("org.osmdroid:osmdroid-android:6.1.18")
 
     implementation(project(":core:database"))
     implementation(project(":core:models"))

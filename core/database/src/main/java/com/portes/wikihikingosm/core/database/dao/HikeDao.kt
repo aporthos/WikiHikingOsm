@@ -23,13 +23,6 @@ interface HikeDao {
     )
     fun isSavedHike(name: String): Int
 
-    suspend fun canInsertHike(hike: HikeEntity): Long {
-        if (isSavedHike(name = hike.name) == 0) {
-            return insertOrIgnoreHike(hike)
-        }
-        return -1
-    }
-
     @Transaction
     @Query("SELECT * FROM hike where idHike = :idHike")
     fun getHikeWithRoute(idHike: Long): Flow<HikeWithRouteRelation>
