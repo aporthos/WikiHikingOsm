@@ -24,6 +24,8 @@ class HikeRepositoryImpl @Inject constructor(
 
     override suspend fun addHike(hike: Hike): Long = dao.insertOrIgnoreHike(hike.asEntity())
 
+    override suspend fun deleteHike(idHike: Long): Boolean = dao.deleteHikeById(idHike = idHike) > 0
+
     override suspend fun canAddHike(hike: Hike): Boolean =
         dao.isSavedHike(name = hike.asEntity().name) == 0
 }
@@ -33,5 +35,6 @@ interface HikeRepository {
     fun getHikeWithRoute(idHike: Long): Flow<HikeWithRoute>
     fun getHikeWithWayPoints(idHike: Long): Flow<HikeWithWayPoints>
     suspend fun addHike(hike: Hike): Long
+    suspend fun deleteHike(idHike: Long): Boolean
     suspend fun canAddHike(hike: Hike): Boolean
 }

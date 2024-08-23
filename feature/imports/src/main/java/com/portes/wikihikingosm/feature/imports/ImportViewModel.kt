@@ -9,10 +9,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ticofab.androidgpxparser.parser.domain.Gpx
 import io.ticofab.androidgpxparser.parser.domain.TrackPoint
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Polyline
@@ -22,20 +21,19 @@ import javax.inject.Inject
 class ImportViewModel @Inject constructor(
     private val addHikeUseCase: AddHikeUseCase,
 ) : ViewModel() {
-    private val _hikingSaveUiState = MutableStateFlow<HikingSaveUiState>(HikingSaveUiState.Loading)
-    val hikingSaveUiState: StateFlow<HikingSaveUiState> = _hikingSaveUiState.asStateFlow()
+    private val _hikingSaveUiState = MutableSharedFlow<HikingSaveUiState>(replay = 1)
+    val hikingSaveUiState: SharedFlow<HikingSaveUiState> = _hikingSaveUiState.asSharedFlow()
 
     fun addHike(gpx: Gpx) {
-        gpx.let {
-            viewModelScope.launch {
-                addHikeUseCase(AddHikeUseCase.Params(getHike(it)))
-                    .onSuccess {
-                        delay(5_000)
-                        _hikingSaveUiState.update { HikingSaveUiState.Success }
-                    }.onFailure {
-                        _hikingSaveUiState.update { HikingSaveUiState.Error }
-                    }
-            }
+        viewModelScope.launch {
+            _hikingSaveUiState.tryEmit(HikingSaveUiState.Loading)
+            addHikeUseCase(AddHikeUseCase.Params(getHike(gpx)))
+                .onSuccess {
+                    delay(1_000)
+                    _hikingSaveUiState.tryEmit(HikingSaveUiState.Success)
+                }.onFailure {
+                    _hikingSaveUiState.tryEmit(HikingSaveUiState.Error)
+                }
         }
     }
 

@@ -3,7 +3,7 @@ package com.portes.wikihikingosm.feature.hikings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.portes.wikihikingosm.core.common.domain.None
-import com.portes.wikihikingosm.core.domain.usecases.AddHikeUseCase
+import com.portes.wikihikingosm.core.domain.usecases.DeleteHikeByIdUseCase
 import com.portes.wikihikingosm.core.domain.usecases.GetHikesUseCase
 import com.portes.wikihikingosm.core.domain.usecases.HikingRoutePref
 import com.portes.wikihikingosm.core.models.Hike
@@ -14,12 +14,12 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
 
 @HiltViewModel
 class HikingViewModel @Inject constructor(
     getHikesUseCase: GetHikesUseCase,
+    private val deleteHikeByIdUseCase: DeleteHikeByIdUseCase,
     private val hikingRoutePref: HikingRoutePref
 ) : ViewModel() {
 
@@ -38,6 +38,13 @@ class HikingViewModel @Inject constructor(
         initialValue = HikingUiState.Loading,
         started = SharingStarted.WhileSubscribed()
     )
+
+    fun deleteHike(idHike: Long) {
+        viewModelScope.launch {
+            deleteHikeByIdUseCase(DeleteHikeByIdUseCase.Params(idHike = idHike))
+        }
+    }
+
 }
 
 sealed interface HikingUiState {

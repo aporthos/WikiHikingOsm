@@ -10,18 +10,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.portes.wikihikingosm.core.models.ImportHiking
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 
 @Composable
 fun ImportRoute(
@@ -29,14 +33,13 @@ fun ImportRoute(
     importHiking: ImportHiking?,
     navigationToHome: () -> Unit
 ) {
-    val hikingSaveUiState by viewModel.hikingSaveUiState.collectAsStateWithLifecycle()
-
+    var hikingSaveUiState: HikingSaveUiState by remember { mutableStateOf(HikingSaveUiState.Loading) }
     LaunchedEffect(key1 = importHiking?.gpx) {
         importHiking?.gpx?.let {
             viewModel.addHike(it)
         }
+        viewModel.hikingSaveUiState.onEach { hikingSaveUiState = it }.collect()
     }
-
     ImportScreen(hikingSaveUiState = hikingSaveUiState, navigationToHome = navigationToHome)
 }
 
@@ -46,12 +49,12 @@ fun ImportScreen(hikingSaveUiState: HikingSaveUiState, navigationToHome: () -> U
     when (hikingSaveUiState) {
         HikingSaveUiState.Loading -> ImportHike()
         HikingSaveUiState.Success -> {
-            Toast.makeText(context, "Importacion correcta", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Importacion correcta :)", Toast.LENGTH_SHORT).show()
             navigationToHome()
         }
 
         HikingSaveUiState.Error -> {
-            Toast.makeText(context, "Caminata repetida :)", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Caminata repetida :(", Toast.LENGTH_SHORT).show()
             navigationToHome()
         }
     }
@@ -79,6 +82,6 @@ fun ImportHike() {
                 progress = { progress },
             )
         }
-        Text(text = "Importando los datos de tu caminta")
+        Text(text = "Importando los datos de tu caminata")
     }
 }

@@ -34,4 +34,12 @@ interface HikeDao {
     @Transaction
     @Query("SELECT * FROM hike")
     fun getHikes(): Flow<List<HikeEntity>>
+
+    @Query(
+        value = """
+            DELETE FROM hike 
+            WHERE idHike = :idHike
+    """
+    )
+    fun deleteHikeById(idHike: Long): Int
 }
