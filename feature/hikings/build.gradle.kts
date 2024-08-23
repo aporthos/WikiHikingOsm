@@ -62,6 +62,8 @@ dependencies {
 
     implementation("com.airbnb.android:lottie-compose:6.0.1")
 
+    implementation ("com.github.ticofab:android-gpx-parser:2.3.1")
+
     implementation(project(":core:domain"))
     implementation(project(":core:common"))
     implementation(project(":core:models"))

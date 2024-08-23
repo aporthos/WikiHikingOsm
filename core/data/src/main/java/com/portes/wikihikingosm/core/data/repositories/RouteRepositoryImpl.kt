@@ -21,9 +21,13 @@ class RouteRepositoryImpl @Inject constructor(
         }
         dao.insertOrIgnoreRoute(hikeEntity)
     }
+
+    override suspend fun deleteRoute(idHike: Long): Boolean =
+        dao.deleteRouteById(idHike = idHike) > 0
 }
 
 interface RouteRepository {
     fun getRoute(): Flow<List<Route>>
     suspend fun addRoute(idHike: Long, hike: Hike)
+    suspend fun deleteRoute(idHike: Long): Boolean
 }

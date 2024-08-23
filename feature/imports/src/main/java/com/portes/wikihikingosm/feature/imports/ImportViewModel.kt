@@ -26,7 +26,6 @@ class ImportViewModel @Inject constructor(
 
     fun addHike(gpx: Gpx) {
         viewModelScope.launch {
-            _hikingSaveUiState.tryEmit(HikingSaveUiState.Loading)
             addHikeUseCase(AddHikeUseCase.Params(getHike(gpx)))
                 .onSuccess {
                     delay(1_000)
@@ -76,5 +75,4 @@ fun Gpx.getPoints(): List<GeoPoint> = mutableListOf<GeoPoint>().apply {
 sealed interface HikingSaveUiState {
     object Success : HikingSaveUiState
     object Error : HikingSaveUiState
-    object Loading : HikingSaveUiState
 }

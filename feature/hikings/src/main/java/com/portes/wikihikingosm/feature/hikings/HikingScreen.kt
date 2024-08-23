@@ -1,7 +1,10 @@
 package com.portes.wikihikingosm.feature.hikings
 
+import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.shrinkVertically
@@ -53,8 +56,8 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.portes.wikihikingosm.core.common.extensions.toKm
-import com.portes.wikihikingosm.core.models.Hike
 import com.portes.wikihikingosm.core.designsystem.R
+import com.portes.wikihikingosm.core.models.Hike
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
@@ -64,12 +67,24 @@ import kotlin.time.Duration.Companion.seconds
 @Composable
 fun HikingRoute(
     viewModel: HikingViewModel = hiltViewModel(),
-    onClick: (Long) -> Unit
+    onClick: (Long) -> Unit,
+    onAddHike: (Uri) -> Unit,
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val startingHiking by viewModel.isStartHiking.collectAsStateWithLifecycle()
     var isShowButtonAdd by remember { mutableStateOf(true) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = { result ->
+            if (result.resultCode == RESULT_OK) {
+                result.data?.data?.let { uri ->
+                    onAddHike(uri)
+                }
+            }
+        }
+    )
 
     Scaffold(
         topBar = {
@@ -82,7 +97,7 @@ fun HikingRoute(
         },
         floatingActionButton = {
             if (isShowButtonAdd) {
-                FloatingActionButton(onClick = { }) {
+                FloatingActionButton(onClick = { launcher.launch(openChooserFile()) }) {
                     Icon(Icons.Filled.Add, "")
                 }
             }
@@ -95,20 +110,33 @@ fun HikingRoute(
             startingHiking,
             onClick,
             onGoStartPoint = {
-                val gmmIntentUri =
-                    Uri.parse("google.navigation:q=${it.latitude},${it.longitude}&mode=d")
-                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-                mapIntent.setPackage("com.google.android.apps.maps")
-                context.startActivity(mapIntent)
+                context.startActivity(openNavigation(geoPoint = it))
             },
             isShowButtonAdd = {
                 isShowButtonAdd = !it
             },
             onDeleteHike = {
                 viewModel.deleteHike(it)
+            },
+            onAddHike = {
+                launcher.launch(openChooserFile())
             }
         )
     }
+}
+
+private fun openChooserFile(): Intent {
+    val data = Intent(Intent.ACTION_GET_CONTENT)
+    data.addCategory(Intent.CATEGORY_OPENABLE)
+    data.type = "application/gpx+xml"
+    return Intent.createChooser(data, "Choose a file")
+}
+
+private fun openNavigation(geoPoint: GeoPoint): Intent {
+    val uri = Uri.parse("google.navigation:q=${geoPoint.latitude},${geoPoint.longitude}&mode=d")
+    val intent = Intent(Intent.ACTION_VIEW, uri)
+    intent.setPackage("com.google.android.apps.maps")
+    return intent
 }
 
 @Composable
@@ -119,7 +147,8 @@ fun HikingRoute(
     onClick: (Long) -> Unit,
     onGoStartPoint: (GeoPoint) -> Unit,
     isShowButtonAdd: (Boolean) -> Unit,
-    onDeleteHike: (Long) -> Unit
+    onDeleteHike: (Long) -> Unit,
+    onAddHike: () -> Unit,
 ) {
 
     when (uiState) {
@@ -138,7 +167,8 @@ fun HikingRoute(
                 hikes = uiState.hikes,
                 onGoStartPoint = onGoStartPoint,
                 onClick = onClick,
-                onDeleteHike = onDeleteHike
+                onDeleteHike = onDeleteHike,
+                onAddHike = onAddHike
             )
         }
     }
@@ -150,7 +180,8 @@ fun HikingItems(
     hikes: List<Hike>,
     onGoStartPoint: (GeoPoint) -> Unit,
     onClick: (Long) -> Unit,
-    onDeleteHike: (Long) -> Unit
+    onDeleteHike: (Long) -> Unit,
+    onAddHike: () -> Unit,
 ) {
     if (hikes.isEmpty()) {
         Column(
@@ -173,7 +204,7 @@ fun HikingItems(
                 )
             }
             Text(text = "Aun no tienes caminatas :(")
-            Button(onClick = { }) {
+            Button(onClick = { onAddHike() }) {
                 Text(text = "Agregar caminata")
             }
         }

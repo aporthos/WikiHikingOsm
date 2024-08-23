@@ -1,5 +1,6 @@
 package com.portes.wikihikingosm
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,22 +19,26 @@ fun HistoryWordsNavGraph(
     navController: NavHostController,
     onClickHiking: (Long) -> Unit,
     importHiking: ImportHiking?,
+    onAddHike: (Uri) -> Unit,
 ) {
-    var showSettingsDialog by rememberSaveable { mutableStateOf(importHiking != null) }
-
+    var canImportHiking by rememberSaveable { mutableStateOf(importHiking?.gpx != null) }
     NavHost(
         navController = navController,
         startDestination = "HOME"
     ) {
         composable("HOME") {
-            LaunchedEffect(key1 = showSettingsDialog) {
-                if (showSettingsDialog) {
+            LaunchedEffect(key1 = importHiking) {
+                if (canImportHiking) {
                     navController.navigate("SAVE_HIKING")
-                    showSettingsDialog = false
+                    canImportHiking = false
                 }
             }
-            if (showSettingsDialog.not()) {
-                HikingRoute(onClick = onClickHiking)
+            if (canImportHiking.not()) {
+                HikingRoute(onClick = onClickHiking, onAddHike = {
+                    onAddHike(it)
+                    navController.navigate("SAVE_HIKING")
+                    canImportHiking = false
+                })
             }
         }
         composable("SAVE_HIKING") {

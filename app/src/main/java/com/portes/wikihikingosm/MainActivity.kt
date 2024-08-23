@@ -37,7 +37,13 @@ class MainActivity : ComponentActivity() {
                         val intent = Intent(context, HikingRouteActivity::class.java)
                         intent.putExtra(ID_HIKE, hike)
                         context.startActivity(intent)
-                    }, importHiking = viewModel.importHiking
+                    },
+                    importHiking = viewModel.importHiking,
+                    onAddHike = {
+                        contentResolver.openInputStream(it)?.let { input ->
+                            viewModel.setImport(inputStream = input)
+                        }
+                    }
                 )
             }
         }

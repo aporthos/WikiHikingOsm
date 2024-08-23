@@ -23,4 +23,12 @@ interface RouteDao {
     """
     )
     fun getRoute(): Flow<List<RouteEntity>>
+
+    @Query(
+        value = """
+            DELETE FROM route 
+            WHERE idHikeRoute = :idHike
+    """
+    )
+    fun deleteRouteById(idHike: Long): Int
 }

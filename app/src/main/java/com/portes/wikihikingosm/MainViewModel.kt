@@ -1,5 +1,8 @@
 package com.portes.wikihikingosm
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.portes.wikihikingosm.core.models.ImportHiking
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,11 +15,10 @@ class MainViewModel @Inject constructor(
     private val parser: GPXParser
 ) : ViewModel() {
 
-    private var _importHiking: ImportHiking? = null
-    val importHiking: ImportHiking?
-        get() = _importHiking
+    var importHiking by mutableStateOf(ImportHiking())
+        private set
 
     fun setImport(inputStream: InputStream) {
-        _importHiking = ImportHiking(gpx = parser.parse(inputStream))
+        importHiking = importHiking.copy(gpx = parser.parse(inputStream))
     }
 }

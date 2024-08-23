@@ -10,9 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,36 +31,27 @@ fun ImportRoute(
     importHiking: ImportHiking?,
     navigationToHome: () -> Unit
 ) {
-    var hikingSaveUiState: HikingSaveUiState by remember { mutableStateOf(HikingSaveUiState.Loading) }
-    LaunchedEffect(key1 = importHiking?.gpx) {
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = Unit) {
         importHiking?.gpx?.let {
             viewModel.addHike(it)
         }
-        viewModel.hikingSaveUiState.onEach { hikingSaveUiState = it }.collect()
+
+        viewModel.hikingSaveUiState.onEach { hikingSaveUiState ->
+            when (hikingSaveUiState) {
+                HikingSaveUiState.Success -> {
+                    Toast.makeText(context, "Importacion correcta :)", Toast.LENGTH_SHORT).show()
+                    navigationToHome()
+                }
+
+                HikingSaveUiState.Error -> {
+                    Toast.makeText(context, "Caminata repetida :(", Toast.LENGTH_SHORT).show()
+                    navigationToHome()
+                }
+            }
+        }.collect()
     }
-    ImportScreen(hikingSaveUiState = hikingSaveUiState, navigationToHome = navigationToHome)
-}
-
-@Composable
-fun ImportScreen(hikingSaveUiState: HikingSaveUiState, navigationToHome: () -> Unit) {
-    val context = LocalContext.current
-    when (hikingSaveUiState) {
-        HikingSaveUiState.Loading -> ImportHike()
-        HikingSaveUiState.Success -> {
-            Toast.makeText(context, "Importacion correcta :)", Toast.LENGTH_SHORT).show()
-            navigationToHome()
-        }
-
-        HikingSaveUiState.Error -> {
-            Toast.makeText(context, "Caminata repetida :(", Toast.LENGTH_SHORT).show()
-            navigationToHome()
-        }
-    }
-}
-
-
-@Composable
-fun ImportHike() {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
