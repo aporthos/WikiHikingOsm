@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.portes.wikihikingosm.feature.hikings"
+    namespace = "com.portes.wikihikingosm.feature.weather"
     compileSdk = 34
 
     defaultConfig {
@@ -39,11 +39,6 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.3"
     }
-
-    kotlinOptions.freeCompilerArgs = kotlinOptions.freeCompilerArgs + listOf(
-        "-Xopt-in=androidx.compose.material3.ExperimentalMaterial3Api"
-    )
-
 }
 
 dependencies {
@@ -58,16 +53,7 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     kapt("com.google.dagger:hilt-android-compiler:2.44.2")
 
-    implementation("org.osmdroid:osmdroid-android:6.1.18")
-
     implementation("com.jakewharton.timber:timber:5.0.1")
 
     implementation("com.airbnb.android:lottie-compose:6.0.1")
-
-    implementation ("com.github.ticofab:android-gpx-parser:2.3.1")
-
-    implementation(project(":core:domain"))
-    implementation(project(":core:common"))
-    implementation(project(":core:models"))
-    implementation(project(":core:designsystem"))
 }

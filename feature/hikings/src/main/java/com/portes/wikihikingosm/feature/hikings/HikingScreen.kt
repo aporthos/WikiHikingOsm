@@ -24,7 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -63,7 +62,6 @@ import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 import kotlin.time.Duration.Companion.seconds
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HikingRoute(
     viewModel: HikingViewModel = hiltViewModel(),
@@ -126,10 +124,13 @@ fun HikingRoute(
 }
 
 private fun openChooserFile(): Intent {
-    val data = Intent(Intent.ACTION_GET_CONTENT)
-    data.addCategory(Intent.CATEGORY_OPENABLE)
-    data.type = "application/gpx+xml"
-    return Intent.createChooser(data, "Choose a file")
+    val extraMimeTypes = arrayOf("application/octet-stream", "application/gpx+xml")
+    return Intent(Intent.ACTION_GET_CONTENT).apply {
+        addCategory(Intent.CATEGORY_OPENABLE)
+        type = "application/*"
+        putExtra(Intent.EXTRA_MIME_TYPES, extraMimeTypes)
+        putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+    }
 }
 
 private fun openNavigation(geoPoint: GeoPoint): Intent {
@@ -222,8 +223,6 @@ fun HikingItems(
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HikingItemSwipe(
     hike: Hike,

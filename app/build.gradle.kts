@@ -76,6 +76,7 @@ dependencies {
     implementation(project(":feature:hikings"))
     implementation(project(":feature:routes"))
     implementation(project(":feature:imports"))
+    implementation(project(":feature:weather"))
 
 }
 
