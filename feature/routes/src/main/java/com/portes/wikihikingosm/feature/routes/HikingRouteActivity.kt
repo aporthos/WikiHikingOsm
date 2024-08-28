@@ -37,7 +37,9 @@ class HikingRouteActivity : AppCompatActivity() {
     @Inject
     lateinit var hikingRoutePref: HikingRoutePref
 
-    private var locationOverlayHelper: LocationOverlayHelper? = null
+    @Inject
+    lateinit var locationOverlayHelper: LocationOverlayHelper
+
     private var idHike = 0L
 
     private val backPressedCallback = object : OnBackPressedCallback(true) {
@@ -51,11 +53,7 @@ class HikingRouteActivity : AppCompatActivity() {
 
     private val requestPermissionLauncher =
         multiplePermissionsLauncher(allGranted = {
-            locationOverlayHelper =
-                LocationOverlayHelper(
-                    this,
-                    binding.contentMapView
-                )
+            locationOverlayHelper.startLocationOverlay()
         }, onReject = {})
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,6 +64,7 @@ class HikingRouteActivity : AppCompatActivity() {
 
         ConfigurationMapViewHelper(binding.contentMapView)
         configurationMapItems.initMap(binding.contentMapView)
+        locationOverlayHelper.initLocation(binding.contentMapView)
         idHike = intent?.extras?.getLong(ID_HIKE) ?: 0
 
         if (hasLocationPermissions.not()) {
@@ -76,11 +75,7 @@ class HikingRouteActivity : AppCompatActivity() {
                 )
             )
         } else {
-            locationOverlayHelper =
-                LocationOverlayHelper(
-                    this,
-                    binding.contentMapView
-                )
+            locationOverlayHelper.startLocationOverlay()
         }
 
         onBackPressedDispatcher.addCallback(this, backPressedCallback)
@@ -115,15 +110,7 @@ class HikingRouteActivity : AppCompatActivity() {
 
     private fun listeners() {
         binding.locationFab.setOnClickListener {
-            val mapController = binding.contentMapView.controller
-            val location = locationOverlayHelper?.myLocation
-            locationOverlayHelper?.runOnFirstFix {
-                lifecycleScope.launch {
-                    mapController.setCenter(location)
-                    mapController.animateTo(location)
-                    mapController.setZoom(2.0)
-                }
-            }
+            locationOverlayHelper.addMyLocation()
         }
 
         binding.startHikingButton.setOnClickListener {
@@ -131,6 +118,7 @@ class HikingRouteActivity : AppCompatActivity() {
             binding.startHikingButton.isVisible = false
             binding.stopHikingButton.isVisible = true
             binding.locationFab.isVisible = true
+            locationOverlayHelper.addMyLocation()
         }
         binding.stopHikingButton.setOnClickListener {
             hikingRoutePref.startHiking(idHike = 0)

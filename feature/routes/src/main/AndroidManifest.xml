@@ -5,7 +5,7 @@
         <activity
             android:name="com.portes.wikihikingosm.feature.routes.HikingRouteActivity"
             android:exported="true"
-            android:theme="@style/App.Theme.WikiHikingOsm">
+            android:theme="@style/App.Theme.WikiHikingOsm.NoActionBar">
         </activity>
     </application>
 </manifest>

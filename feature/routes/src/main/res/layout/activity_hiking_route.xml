@@ -27,16 +27,17 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/stopHikingButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:layout_marginStart="16dp"
-            android:text="Terminar"
+            android:text="Terminar caminata"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -46,13 +47,14 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="80dp"
+        android:contentDescription="TODO"
         app:layout_constraintBottom_toTopOf="@+id/directionFab"
         app:layout_constraintEnd_toEndOf="parent"
         app:shapeAppearanceOverlay="@style/fab_3_rounded"
         app:srcCompat="@drawable/location"
-        android:contentDescription="TODO"
-        tools:ignore="ContentDescription" />
+        tools:ignore="ContentDescription"
+        tools:visibility="visible" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
