@@ -9,39 +9,36 @@ import com.portes.wikihikingosm.core.designsystem.R
 import com.portes.wikihikingosm.feature.routes.models.CustomMarker
 import com.portes.wikihikingosm.feature.routes.models.ElevationMarker
 import com.portes.wikihikingosm.feature.routes.models.WayPointMarker
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
-import java.lang.Exception
-import javax.inject.Inject
 
-class ConfigurationMapItems @Inject constructor(
+class ConfigurationMapItems @AssistedInject constructor(
+    @Assisted private val mapView: MapView,
     private val resources: Resources
 ) {
 
-    private var mapView: MapView? = null
-
-    fun initMap(mapView: MapView) {
-        this.mapView = mapView
+    @AssistedFactory
+    interface Factory {
+        fun create(mapView: MapView): ConfigurationMapItems
     }
 
     fun settingsMap(route: List<Route>) {
-        if (mapView == null) {
-            throw Exception("Invalid map")
-        }
-
         val markerStart = Marker(mapView)
         markerStart.icon = ResourcesCompat.getDrawable(resources, R.drawable.start, null)
         markerStart.position = route.first().toGeoPoint()
         markerStart.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
         markerStart.title = "Inicio"
-        mapView?.overlays?.add(markerStart)
+        mapView.overlays.add(markerStart)
 
         val lineGo = Polyline()
         lineGo.setPoints(route.toListGeoPoint())
-        mapView?.post {
-            mapView?.zoomToBoundingBox(
+        mapView.post {
+            mapView.zoomToBoundingBox(
                 lineGo.bounds.increaseByScale(1.5f),
                 true
             )
@@ -89,32 +86,43 @@ class ConfigurationMapItems @Inject constructor(
     }
 
     private fun addMarkers(markers: ArrayList<CustomMarker>) {
-        if (mapView == null) {
-            throw Exception("Invalid map")
-        }
-
         markers.map {
             val marker = Marker(mapView)
             marker.icon = ResourcesCompat.getDrawable(resources, it.icon, null)
             marker.position = it.position
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
             marker.title = it.text
-            mapView?.overlays?.add(marker)
+            mapView.overlays.add(marker)
         }
     }
 
-    fun addRoute(route: List<GeoPoint>, color: Int) {
-        if (mapView == null) {
-            throw Exception("Invalid map")
-        }
-
+    fun addRoute(route: List<GeoPoint>, color: Int, idRoute: String) {
         val path = Polyline()
+        path.id = idRoute
         path.outlinePaint.color = color
         path.outlinePaint.strokeWidth = 30f
         path.outlinePaint.strokeCap = Paint.Cap.ROUND
         path.outlinePaint.alpha = 255
         path.setPoints(route)
-        mapView?.overlays?.add(path)
+        mapView.overlays.add(path)
+    }
+
+    fun removeRoute(idRoute: String) {
+        mapView.overlays.map { polyline ->
+            if (polyline is Polyline && polyline.id == idRoute) {
+                mapView.overlays.remove(polyline)
+            }
+        }
+    }
+
+    fun countRoute(idRoute: String): Int {
+        var counter = 0
+        mapView.overlays.map { polyline ->
+            if (polyline is Polyline && polyline.id == idRoute) {
+                counter++
+            }
+        }
+        return counter
     }
 }
 

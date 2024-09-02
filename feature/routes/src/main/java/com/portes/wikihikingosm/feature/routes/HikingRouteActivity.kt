@@ -2,28 +2,32 @@ package com.portes.wikihikingosm.feature.routes
 
 import android.Manifest
 import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.portes.wikihikingosm.core.common.extensions.hasLocationPermissions
 import com.portes.wikihikingosm.core.common.extensions.multiplePermissionsLauncher
+import com.portes.wikihikingosm.core.common.extensions.toKm
 import com.portes.wikihikingosm.core.common.extensions.viewBinding
-import com.portes.wikihikingosm.core.models.Route
-import com.portes.wikihikingosm.feature.routes.databinding.ActivityHikingRouteBinding
 import com.portes.wikihikingosm.core.domain.usecases.HikingRoutePref
+import com.portes.wikihikingosm.core.models.Route
 import com.portes.wikihikingosm.feature.routes.HikingRouteViewModel.Companion.ID_HIKE
+import com.portes.wikihikingosm.feature.routes.databinding.ActivityHikingRouteBinding
 import com.portes.wikihikingosm.feature.routes.helpers.ConfigurationMapItems
 import com.portes.wikihikingosm.feature.routes.helpers.ConfigurationMapViewHelper
 import com.portes.wikihikingosm.feature.routes.helpers.LocationOverlayHelper
+import com.portes.wikihikingosm.feature.routes.helpers.MapEventsHelper
 import com.portes.wikihikingosm.feature.routes.helpers.toListGeoPoint
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import timber.log.Timber
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class HikingRouteActivity : AppCompatActivity() {
@@ -32,19 +36,36 @@ class HikingRouteActivity : AppCompatActivity() {
     private val binding by viewBinding(ActivityHikingRouteBinding::inflate)
 
     @Inject
-    lateinit var configurationMapItems: ConfigurationMapItems
+    lateinit var configurationMapItemsFactory: ConfigurationMapItems.Factory
 
     @Inject
     lateinit var hikingRoutePref: HikingRoutePref
 
     @Inject
-    lateinit var locationOverlayHelper: LocationOverlayHelper
+    lateinit var locationOverlayHelperFactory: LocationOverlayHelper.Factory
+
+    @Inject
+    lateinit var mapEventsHelperFactory: MapEventsHelper.Factory
+
+    @Inject
+    lateinit var configurationMapViewHelper: ConfigurationMapViewHelper.Factory
 
     private var idHike = 0L
+    private var backPressed = 0L
+    private var configurationMapItems: ConfigurationMapItems? = null
+    private var locationOverlayHelper: LocationOverlayHelper? = null
+
+    companion object {
+        private val ID_CALCULATE_DISTANCE_ROUTE = "CALCULATE_DISTANCE_ROUTE"
+        private val ID_GO_ROUTE = "CALCULATE_GO_ROUTE"
+        private val ID_GO_RETURN = "CALCULATE_GO_RETURN"
+    }
 
     private val backPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
+            onBack()
             if (hikingRoutePref.isStartHiking() != 0L) {
+                configurationMapItems?.removeRoute(ID_CALCULATE_DISTANCE_ROUTE)
                 return
             }
             finish()
@@ -53,7 +74,7 @@ class HikingRouteActivity : AppCompatActivity() {
 
     private val requestPermissionLauncher =
         multiplePermissionsLauncher(allGranted = {
-            locationOverlayHelper.startLocationOverlay()
+            locationOverlayHelper?.start()
         }, onReject = {})
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,10 +82,10 @@ class HikingRouteActivity : AppCompatActivity() {
         Configuration.getInstance()
             .load(this, getSharedPreferences("map", Context.MODE_PRIVATE))
         setContentView(binding.root)
+        configurationMapViewHelper.create(binding.contentMapView).start()
+        configurationMapItems = configurationMapItemsFactory.create(binding.contentMapView)
+        locationOverlayHelper = locationOverlayHelperFactory.create(binding.contentMapView)
 
-        ConfigurationMapViewHelper(binding.contentMapView)
-        configurationMapItems.initMap(binding.contentMapView)
-        locationOverlayHelper.initLocation(binding.contentMapView)
         idHike = intent?.extras?.getLong(ID_HIKE) ?: 0
 
         if (hasLocationPermissions.not()) {
@@ -75,19 +96,21 @@ class HikingRouteActivity : AppCompatActivity() {
                 )
             )
         } else {
-            locationOverlayHelper.startLocationOverlay()
+            locationOverlayHelper?.start()
         }
+
+        val mapEventsHelper = mapEventsHelperFactory.create(
+            mapView = binding.contentMapView,
+            configurationMapItems = configurationMapItems,
+            locationOverlayHelper = locationOverlayHelper
+        )
 
         onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
         lifecycleScope.launch {
             viewModel.uiState.collect { state ->
                 when (state) {
-                    is HikingRouteUiState.Success -> {
-                        configurationHikeRoute(state.route)
-                        configurationMapItems.addWayPoints(state.wayPoints)
-                    }
-
+                    is HikingRouteUiState.Success -> configurationHikeRoute(state.route)
                     HikingRouteUiState.Loading -> {
                         Timber.i("cargando ")
                     }
@@ -99,6 +122,7 @@ class HikingRouteActivity : AppCompatActivity() {
             binding.startHikingButton.isVisible = false
             binding.stopHikingButton.isVisible = true
             binding.locationFab.isVisible = true
+            locationOverlayHelper?.locationAnimation()
         } else {
             binding.startHikingButton.isVisible = true
             binding.locationFab.isVisible = false
@@ -106,11 +130,18 @@ class HikingRouteActivity : AppCompatActivity() {
         }
 
         listeners()
+        mapEventsHelper.startMapEvents(ID_CALCULATE_DISTANCE_ROUTE) { distance ->
+            Toast.makeText(
+                this@HikingRouteActivity,
+                "Distancia ${distance.toKm()} km",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     private fun listeners() {
         binding.locationFab.setOnClickListener {
-            locationOverlayHelper.addMyLocation()
+            locationOverlayHelper?.locationAnimation()
         }
 
         binding.startHikingButton.setOnClickListener {
@@ -118,7 +149,7 @@ class HikingRouteActivity : AppCompatActivity() {
             binding.startHikingButton.isVisible = false
             binding.stopHikingButton.isVisible = true
             binding.locationFab.isVisible = true
-            locationOverlayHelper.addMyLocation()
+            locationOverlayHelper?.locationAnimation()
         }
         binding.stopHikingButton.setOnClickListener {
             hikingRoutePref.startHiking(idHike = 0)
@@ -128,10 +159,33 @@ class HikingRouteActivity : AppCompatActivity() {
 
     private fun configurationHikeRoute(route: List<Route>) {
         val middle = route.toListGeoPoint().size / 2
-        configurationMapItems.addRoute(route.toListGeoPoint().take(middle + 1), 0x009688)
-        configurationMapItems.addRoute(route.toListGeoPoint().takeLast(middle + 1), 0xFFA000)
-        configurationMapItems.addElevations(route)
-        configurationMapItems.settingsMap(route)
+        configurationMapItems?.addRoute(
+            route = route.toListGeoPoint().take(middle + 1),
+            color = 0x009688,
+            idRoute = ID_GO_ROUTE
+        )
+        configurationMapItems?.addRoute(
+            route = route.toListGeoPoint().takeLast(middle + 1),
+            color = 0xFFA000,
+            idRoute = ID_GO_RETURN
+        )
+        configurationMapItems?.addElevations(route)
+        configurationMapItems?.settingsMap(route)
+    }
+
+    private fun onBack() {
+        val totalRoute = configurationMapItems?.countRoute(ID_CALCULATE_DISTANCE_ROUTE) ?: 0
+        if (totalRoute < 1) {
+            if (backPressed + 2000 > System.currentTimeMillis()) {
+                finishAffinity()
+            } else {
+                Toast.makeText(
+                    this@HikingRouteActivity, "Presiona de nuevo para salir",
+                    Toast.LENGTH_SHORT
+                ).show()
+                backPressed = System.currentTimeMillis();
+            }
+        }
     }
 
     override fun onResume() {

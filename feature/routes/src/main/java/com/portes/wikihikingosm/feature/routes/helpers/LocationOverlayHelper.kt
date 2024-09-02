@@ -2,53 +2,52 @@ package com.portes.wikihikingosm.feature.routes.helpers
 
 import android.content.Context
 import com.portes.wikihikingosm.core.common.di.MainDispatcher
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.osmdroid.api.IMapController
+import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-import java.lang.Exception
-import javax.inject.Inject
 
-
-class LocationOverlayHelper @Inject constructor(
+class LocationOverlayHelper @AssistedInject constructor(
+    @Assisted private val mapView: MapView,
     @ApplicationContext val context: Context,
     @MainDispatcher private val dispatcher: CoroutineDispatcher,
 ) {
 
+    @AssistedFactory
+    interface Factory {
+        fun create(mapView: MapView): LocationOverlayHelper
+    }
+
     private val scope = CoroutineScope(dispatcher)
     private var locationOverlay: LocationOverlay? = null
 
-    private var mapView: MapView? = null
-
-    fun initLocation(mapView: MapView) {
-        this.mapView = mapView
+    fun start() {
+        locationOverlay = LocationOverlay(context, mapView)
     }
 
-    fun startLocationOverlay() {
-        mapView?.let {
-            locationOverlay = LocationOverlay(context, it)
-        } ?: run {
-            throw Exception("Invalid map")
-        }
-    }
-
-    fun addMyLocation() {
-        mapView?.controller?.let { controller ->
-            locationOverlay?.addMyLocation(controller, scope)
+    fun locationAnimation() {
+        mapView.controller?.let { controller ->
+            locationOverlay?.locationAnimation(controller, scope)
         }
 
-        mapView?.overlays?.map {
-            if (it is LocationOverlay) {
-                mapView?.overlays?.remove(it)
+        mapView.overlays?.map { location ->
+            if (location is LocationOverlay) {
+                mapView.overlays?.remove(location)
             }
         }
 
-        mapView?.overlays?.add(locationOverlay)
+        mapView.overlays?.add(locationOverlay)
     }
+
+    fun getLocation(): GeoPoint? = locationOverlay?.getLocation()
 }
 
 class LocationOverlay(context: Context, mapView: MapView) :
@@ -61,13 +60,19 @@ class LocationOverlay(context: Context, mapView: MapView) :
         isDrawAccuracyEnabled = true
     }
 
-    fun addMyLocation(controller: IMapController, scope: CoroutineScope) {
+    fun locationAnimation(
+        controller: IMapController,
+        scope: CoroutineScope,
+    ) {
+        val location = getLocation()
         runOnFirstFix {
             scope.launch {
-                controller.setCenter(myLocation)
-                controller.animateTo(myLocation)
+                controller.setCenter(location)
+                controller.animateTo(location)
                 controller.setZoom(24.0)
             }
         }
     }
+
+    fun getLocation(): GeoPoint? = myLocation
 }
