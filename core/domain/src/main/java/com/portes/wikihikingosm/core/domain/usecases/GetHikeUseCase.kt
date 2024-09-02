@@ -1,8 +1,9 @@
 package com.portes.wikihikingosm.core.domain.usecases
 
+import com.portes.wikihikingosm.core.common.TYPE_GO
+import com.portes.wikihikingosm.core.common.TYPE_RETURN
 import com.portes.wikihikingosm.core.common.di.IoDispatcher
 import com.portes.wikihikingosm.core.common.domain.FlowSingleUseCase
-import com.portes.wikihikingosm.core.common.domain.None
 import com.portes.wikihikingosm.core.data.repositories.HikeRepository
 import com.portes.wikihikingosm.core.models.Hike
 import com.portes.wikihikingosm.core.models.Route
@@ -21,12 +22,19 @@ class GetHikeUseCase @Inject constructor(
         repository.getHikeWithRoute(params),
         repository.getHikeWithWayPoints(params)
     ) { route, wayPoints ->
-        HikeData(route.hike, route.route, wayPoints.wayPoints)
+        val hikeData = HikeData(
+            hike = route.hike,
+            routeGo = route.route.filter { it.type == TYPE_GO },
+            routeReturn = route.route.filter { it.type == TYPE_RETURN },
+            wayPoints = wayPoints.wayPoints
+        )
+        hikeData
     }
 }
 
 data class HikeData(
     val hike: Hike,
-    val route: List<Route>,
+    val routeGo: List<Route>,
+    val routeReturn: List<Route>,
     val wayPoints: List<WayPoints>
 )

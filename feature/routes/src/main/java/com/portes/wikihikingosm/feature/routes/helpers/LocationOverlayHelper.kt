@@ -8,6 +8,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.osmdroid.api.IMapController
 import org.osmdroid.util.GeoPoint
@@ -34,17 +35,17 @@ class LocationOverlayHelper @AssistedInject constructor(
     }
 
     fun locationAnimation() {
-        mapView.controller?.let { controller ->
-            locationOverlay?.locationAnimation(controller, scope)
-        }
-
-        mapView.overlays?.map { location ->
+        mapView.overlays.map { location ->
             if (location is LocationOverlay) {
-                mapView.overlays?.remove(location)
+                mapView.overlays.remove(location)
             }
         }
 
-        mapView.overlays?.add(locationOverlay)
+        mapView.controller.let { controller ->
+            locationOverlay?.locationAnimation(controller, scope) {
+                mapView.overlays.add(locationOverlay)
+            }
+        }
     }
 
     fun getLocation(): GeoPoint? = locationOverlay?.getLocation()
@@ -63,13 +64,15 @@ class LocationOverlay(context: Context, mapView: MapView) :
     fun locationAnimation(
         controller: IMapController,
         scope: CoroutineScope,
+        onSuccessLocation: () -> Unit
     ) {
         val location = getLocation()
         runOnFirstFix {
             scope.launch {
-                controller.setCenter(location)
+                delay(1_000)
                 controller.animateTo(location)
-                controller.setZoom(24.0)
+                controller.setZoom(22.0)
+                onSuccessLocation()
             }
         }
     }

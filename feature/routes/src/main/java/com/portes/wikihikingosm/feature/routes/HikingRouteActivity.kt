@@ -110,7 +110,11 @@ class HikingRouteActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.uiState.collect { state ->
                 when (state) {
-                    is HikingRouteUiState.Success -> configurationHikeRoute(state.route)
+                    is HikingRouteUiState.Success -> configurationHikeRoute(
+                        state.routeGo,
+                        state.routeReturn
+                    )
+
                     HikingRouteUiState.Loading -> {
                         Timber.i("cargando ")
                     }
@@ -157,20 +161,25 @@ class HikingRouteActivity : AppCompatActivity() {
         }
     }
 
-    private fun configurationHikeRoute(route: List<Route>) {
-        val middle = route.toListGeoPoint().size / 2
+    private fun configurationHikeRoute(routeGo: List<Route>, routeReturn: List<Route>) {
         configurationMapItems?.addRoute(
-            route = route.toListGeoPoint().take(middle + 1),
+            route = routeGo.toListGeoPoint(),
             color = 0x009688,
             idRoute = ID_GO_ROUTE
         )
         configurationMapItems?.addRoute(
-            route = route.toListGeoPoint().takeLast(middle + 1),
+            route = routeReturn.toListGeoPoint(),
             color = 0xFFA000,
             idRoute = ID_GO_RETURN
         )
-        configurationMapItems?.addElevations(route)
-        configurationMapItems?.settingsMap(route)
+
+        val routeComplete = mutableListOf<Route>().apply {
+            addAll(routeGo)
+            addAll(routeReturn)
+        }
+
+        configurationMapItems?.addElevations(routeComplete)
+        configurationMapItems?.settingsMap(routeComplete)
     }
 
     private fun onBack() {

@@ -12,19 +12,22 @@ data class RouteEntity(
     val idHikeRoute: Long,
     val latitude: Double,
     val longitude: Double,
-    val elevation: Double
+    val elevation: Double,
+    val type: String
 )
 
 fun RouteEntity.asModel() = Route(
     latitude = latitude,
     longitude = longitude,
     idHikeRoute = idHikeRoute,
-    elevation = elevation
+    elevation = elevation,
+    type = type
 )
 
 fun Route.asEntity() = RouteEntity(
     latitude = latitude,
     longitude = longitude,
     idHikeRoute = idHikeRoute,
-    elevation = elevation
+    elevation = elevation,
+    type = type
 )

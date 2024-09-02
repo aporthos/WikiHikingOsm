@@ -28,7 +28,8 @@ class HikingRouteViewModel @Inject constructor(
 
     val uiState: StateFlow<HikingRouteUiState> = getHikeUseCase(idHike).map {
         HikingRouteUiState.Success(
-            route = it.route,
+            routeGo = it.routeGo,
+            routeReturn = it.routeReturn,
             hike = it.hike,
             wayPoints = it.wayPoints
         )
@@ -41,7 +42,8 @@ class HikingRouteViewModel @Inject constructor(
 
 sealed interface HikingRouteUiState {
     data class Success(
-        val route: List<Route> = emptyList(),
+        val routeGo: List<Route> = emptyList(),
+        val routeReturn: List<Route> = emptyList(),
         val hike: Hike,
         val wayPoints: List<WayPoints>,
     ) : HikingRouteUiState
