@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Polyline
-import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,20 +39,27 @@ class ImportViewModel @Inject constructor(
         }
     }
 
-    private fun getHike(gpx: Gpx): Hike = Hike(
-        name = gpx.tracks.firstOrNull()?.trackName.orEmpty(),
-        startPoint = GeoPoint(
-            gpx.getTrackPoints().firstOrNull()?.latitude ?: 0.0,
-            gpx.getTrackPoints().firstOrNull()?.longitude ?: 0.0
-        ),
-        distanceTotal = getTotalDistance(gpx.getPoints()),
-        route = getGoRoute(gpx.getPoints())
-    )
+    private fun getHike(gpx: Gpx): Hike {
+        val points = gpx.getPoints()
+        val (maxElevation, minElevation) = getElevations(points)
+        return Hike(
+            name = gpx.tracks.firstOrNull()?.trackName.orEmpty(),
+            startPoint = GeoPoint(
+                gpx.getTrackPoints().firstOrNull()?.latitude ?: 0.0,
+                gpx.getTrackPoints().firstOrNull()?.longitude ?: 0.0
+            ),
+            distanceTotal = getTotalDistance(points),
+            route = getRoute(points),
+            timeDuration = gpx.getTime(),
+            maxElevation = maxElevation,
+            minElevation = minElevation
+        )
+    }
 
     private fun getTotalDistance(list: List<GeoPoint>): Double =
         Polyline().apply { setPoints(list) }.distance
 
-    private fun getGoRoute(list: List<GeoPoint>): List<Route> {
+    private fun getRoute(list: List<GeoPoint>): List<Route> {
         val item = getItemMiddle(list)
         val routeGo = list.slice(0..item).map {
             Route(
@@ -75,6 +82,9 @@ class ImportViewModel @Inject constructor(
             addAll(routeReturn)
         }
     }
+
+    private fun getElevations(list: List<GeoPoint>): Pair<Double, Double> =
+        Pair(list.maxBy { it.altitude }.altitude, list.minBy { it.altitude }.altitude)
 
     private fun getItemMiddle(list: List<GeoPoint>): Int {
         var distanceTotal = 0.0
@@ -103,6 +113,23 @@ fun Gpx.getPoints(): List<GeoPoint> = mutableListOf<GeoPoint>().apply {
         add(
             GeoPoint(it.latitude, it.longitude, it.elevation)
         )
+    }
+}
+
+fun Gpx.getTime(): String {
+    val startDate = getTrackPoints().firstOrNull()?.time?.millis ?: 0
+    val endDate = getTrackPoints().lastOrNull()?.time?.millis ?: 0
+
+    val diffDate = endDate.minus(startDate)
+    val seconds = TimeUnit.MILLISECONDS.toSeconds(diffDate)
+    val days = TimeUnit.SECONDS.toDays(seconds)
+    val hours = TimeUnit.SECONDS.toHours(seconds)
+    val minutes = TimeUnit.SECONDS.toMinutes(seconds) % 60
+
+    return if (days < 1) {
+        "$hours h $minutes min"
+    } else {
+        "$days d $hours h $minutes min"
     }
 }
 

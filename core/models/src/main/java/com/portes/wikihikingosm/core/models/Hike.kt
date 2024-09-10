@@ -7,5 +7,8 @@ data class Hike(
     val name: String,
     val startPoint: GeoPoint,
     val distanceTotal: Double,
-    val route: List<Route> = emptyList()
+    val route: List<Route> = emptyList(),
+    val timeDuration: String,
+    val maxElevation: Double,
+    val minElevation: Double,
 )

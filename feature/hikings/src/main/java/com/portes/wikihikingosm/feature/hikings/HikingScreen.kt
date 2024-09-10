@@ -320,7 +320,7 @@ fun HikingItem(hike: Hike, onClick: (Hike) -> Unit, onGoStartPoint: (GeoPoint) -
                     style = MaterialTheme.typography.titleLarge
                 )
                 Text(
-                    text = "Distancia ${hike.distanceTotal.toKm()} km",
+                    text = "Distancia ${hike.distanceTotal.toKm()}",
                 )
             }
 

@@ -16,18 +16,27 @@ data class HikeEntity(
     @TypeConverters(GeoPointConverters::class)
     val startPoint: GeoPoint,
     val distanceTotal: Double,
+    val timeDuration: String,
+    val maxElevation: Double,
+    val minElevation: Double,
 )
 
 fun HikeEntity.asModel() = Hike(
     name = name,
     idHike = idHike,
     startPoint = startPoint,
-    distanceTotal = distanceTotal
+    distanceTotal = distanceTotal,
+    timeDuration = timeDuration,
+    maxElevation = maxElevation,
+    minElevation = minElevation
 )
 
 fun Hike.asEntity() = HikeEntity(
     name = name,
     idHike = idHike,
     startPoint = startPoint,
-    distanceTotal = distanceTotal
+    distanceTotal = distanceTotal,
+    timeDuration = timeDuration,
+    maxElevation = maxElevation,
+    minElevation = minElevation
 )

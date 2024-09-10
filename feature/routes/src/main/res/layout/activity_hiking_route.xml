@@ -6,55 +6,58 @@
     android:layout_height="match_parent"
     tools:context="com.portes.wikihikingosm.feature.routes.HikingRouteActivity">
 
-    <org.osmdroid.views.MapView
-        android:id="@+id/contentMapView"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </org.osmdroid.views.MapView>
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardInfoMain"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            app:cardCornerRadius="8dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="32dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:orientation="vertical">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/startHikingButton"
+                <TextView
+                    android:id="@+id/elevationLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Elevacion:" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/locationFab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="Iniciar caminata"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/stopHikingButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="Terminar caminata"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="90dp"
+            android:elevation="0dp"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/directionFab"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:shapeAppearanceOverlay="@style/fab_3_rounded"
+            app:srcCompat="@drawable/location"
+            tools:ignore="ContentDescription"
             tools:visibility="visible" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <org.osmdroid.views.MapView
+            android:id="@+id/contentMapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/locationFab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="80dp"
-        android:contentDescription="TODO"
-        app:layout_constraintBottom_toTopOf="@+id/directionFab"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:shapeAppearanceOverlay="@style/fab_3_rounded"
-        app:srcCompat="@drawable/location"
-        tools:ignore="ContentDescription"
-        tools:visibility="visible" />
+    <include
+        android:id="@+id/modal_bottom_sheet_route"
+        layout="@layout/modal_bottom_sheet_route" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
