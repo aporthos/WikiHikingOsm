@@ -32,7 +32,7 @@ interface HikeDao {
     fun getHikeWithWayPoints(idHike: Long): Flow<HikeWithWayPointsRelation>
 
     @Transaction
-    @Query("SELECT * FROM hike")
+    @Query("SELECT * FROM hike ORDER BY idHike DESC")
     fun getHikes(): Flow<List<HikeEntity>>
 
     @Query(

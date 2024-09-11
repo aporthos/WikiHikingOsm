@@ -6,9 +6,9 @@ import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -29,6 +29,7 @@ import com.portes.wikihikingosm.feature.routes.helpers.ConfigurationMapViewHelpe
 import com.portes.wikihikingosm.feature.routes.helpers.LocationOverlayHelper
 import com.portes.wikihikingosm.feature.routes.helpers.MapEventsHelper
 import com.portes.wikihikingosm.feature.routes.helpers.MapListenerHelper
+import com.portes.wikihikingosm.feature.routes.helpers.OnBackPressedCallbackHelper
 import com.portes.wikihikingosm.feature.routes.helpers.toListGeoPoint
 import com.portes.wikihikingosm.core.designsystem.R as DesignSystem
 import dagger.hilt.android.AndroidEntryPoint
@@ -41,9 +42,9 @@ import javax.inject.Inject
 class HikingRouteActivity : AppCompatActivity() {
 
     companion object {
-        private const val ID_CALCULATE_DISTANCE_ROUTE = "CALCULATE_DISTANCE_ROUTE"
-        private const val ID_GO_ROUTE = "CALCULATE_GO_ROUTE"
-        private const val ID_GO_RETURN = "CALCULATE_GO_RETURN"
+        const val ID_CALCULATE_DISTANCE_ROUTE = "CALCULATE_DISTANCE_ROUTE"
+        const val ID_GO_ROUTE = "CALCULATE_GO_ROUTE"
+        const val ID_GO_RETURN = "CALCULATE_GO_RETURN"
     }
 
     private val viewModel: HikingRouteViewModel by viewModels()
@@ -65,23 +66,11 @@ class HikingRouteActivity : AppCompatActivity() {
     lateinit var configurationMapViewHelper: ConfigurationMapViewHelper.Factory
 
     private var idHike = 0L
-    private var backPressed = 0L
     private var configurationMapItems: ConfigurationMapItems? = null
     private var locationOverlayHelper: LocationOverlayHelper? = null
     private lateinit var modalBottomSheetRouteBehavior: BottomSheetBehavior<*>
     private var isScrollingMap = false
     private var isZoomMap = false
-
-    private val backPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            onBack()
-            if (hikingRoutePref.isStartHiking() != 0L) {
-                configurationMapItems?.removeRoute(ID_CALCULATE_DISTANCE_ROUTE)
-                return
-            }
-            finish()
-        }
-    }
 
     private val requestPermissionLauncher =
         multiplePermissionsLauncher(allGranted = {
@@ -122,7 +111,13 @@ class HikingRouteActivity : AppCompatActivity() {
             ).show()
         }
 
-        onBackPressedDispatcher.addCallback(this, backPressedCallback)
+        onBackPressedDispatcher.addCallback(
+            this, OnBackPressedCallbackHelper(context = this,
+                hikingRoutePref = hikingRoutePref,
+                configurationMapItems = configurationMapItems,
+                onFinish = { finish() },
+                onFinishAffinity = { finishAffinity() })
+        )
         binding.contentMapView.addMapListener(
             MapListenerHelper(binding = binding, isScrollingMap = { isScrollingMap ->
                 this.isScrollingMap = isScrollingMap
@@ -154,12 +149,10 @@ class HikingRouteActivity : AppCompatActivity() {
             if (hikingRoutePref.isStartHiking() != 0L) {
                 modalBottomSheetRoute.startHikingButton.isVisible = false
                 modalBottomSheetRoute.imageCancelRoute.isVisible = true
-                elevationLabel.isVisible = true
                 cardInfoMain.isVisible = true
                 modalBottomSheetRouteBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             } else {
                 modalBottomSheetRoute.startHikingButton.isVisible = true
-                elevationLabel.isVisible = false
                 modalBottomSheetRoute.imageCancelRoute.isVisible = false
                 cardInfoMain.isVisible = false
                 modalBottomSheetRouteBehavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -181,9 +174,11 @@ class HikingRouteActivity : AppCompatActivity() {
                 hikingRoutePref.startHiking(idHike = idHike)
                 startHikingButton.isVisible = false
                 imageCancelRoute.isVisible = true
-                binding.elevationLabel.isVisible = true
                 binding.locationFab.isVisible = true
                 onStartLocation()
+                if (modalBottomSheetRouteBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                    modalBottomSheetRouteBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                }
             }
             imageCancelRoute.setOnClickListener {
                 hikingRoutePref.startHiking(idHike = 0)
@@ -251,22 +246,8 @@ class HikingRouteActivity : AppCompatActivity() {
         configurationMapItems?.settingsMap(routeComplete)
     }
 
-    private fun onBack() {
-        val totalRoute = configurationMapItems?.countRoute(ID_CALCULATE_DISTANCE_ROUTE) ?: 0
-        if (totalRoute < 1) {
-            if (backPressed + 2000 > System.currentTimeMillis()) {
-                finishAffinity()
-            } else {
-                Toast.makeText(
-                    this@HikingRouteActivity, "Presiona de nuevo para salir",
-                    Toast.LENGTH_SHORT
-                ).show()
-                backPressed = System.currentTimeMillis();
-            }
-        }
-    }
-
     private fun onStartLocation() {
+        binding.cardInfoMain.isVisible = true
         locationOverlayHelper?.onLocationChanged { geoPoint ->
             binding.elevationLabel.text = "Elevacion: ${geoPoint?.altitude?.toMeters()}"
             locationOverlayHelper?.locationAnimation(geoPoint, isScrollingMap, isZoomMap)
@@ -275,7 +256,7 @@ class HikingRouteActivity : AppCompatActivity() {
 
     private fun setToolbarTransparent() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.setDecorFitsSystemWindows(false)
+            WindowCompat.setDecorFitsSystemWindows(window, true)
         } else {
             window.setFlags(
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
